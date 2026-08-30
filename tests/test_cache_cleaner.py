@@ -10,8 +10,6 @@ Tests are organized by concern:
 
 import threading
 
-import pytest
-
 from src.mcp_servers.cache_cleaner_server import (
     MOCK_CACHE_REGISTRY,
     REQUIRED_APPROVAL_TOKEN,
@@ -43,7 +41,7 @@ class TestCacheInspection:
 
         _ = inspect_cache_health_impl()
 
-        assert MOCK_CACHE_REGISTRY == before_state
+        assert before_state == MOCK_CACHE_REGISTRY
 
     def test_inspect_reports_critical_when_poisoned_keys_present(self) -> None:
         """Health status must be CRITICAL when leaked or deadlocked keys exist."""
@@ -92,7 +90,7 @@ class TestSandboxDryRun:
         dry_run_remediation_impl("leak:*")
         dry_run_remediation_impl("*")
 
-        assert MOCK_CACHE_REGISTRY == before_state
+        assert before_state == MOCK_CACHE_REGISTRY
 
 
 class TestHITLApprovalGates:
