@@ -2,13 +2,13 @@
 > **Autonomous Zero-Trust Incident Remediation Runtime on TrueForge**
 > *Mission TF-007 • Production Infrastructure Governance & Automated SRE*
 
-[![Harness: TrueForge](https://img.shields.io/badge/Harness-TrueForge_v1.0-1e293b?style=flat-square)](https://trueforge.dev)
-[![Review: Qodo AI](https://img.shields.io/badge/Review-Qodo_AI_Verified-1e293b?style=flat-square)](https://qodo.ai)
-[![Models: Gemini 3.1](https://img.shields.io/badge/Models-Gemini_3.1_Pro_%7C_Flash-1e293b?style=flat-square)](https://ai.google.dev)
-[![Sandbox: Daytona](https://img.shields.io/badge/Sandbox-Daytona_OCI-1e293b?style=flat-square)](https://daytona.io)
-[![Safety: HITL](https://img.shields.io/badge/Safety_Gate-HITL_Enforced-1e293b?style=flat-square)](#formal-safety-invariants--hitl-gate)
-[![CI Status](https://img.shields.io/badge/CI-Passing-1e293b?style=flat-square)](https://github.com/Anurag-tech22/bomb-squad-agent/actions)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-1e293b?style=flat-square)](LICENSE)
+[![Harness: TrueForge](https://img.shields.io/badge/Agent_Harness-TrueForge_v1.0-2563EB?style=flat-square&logo=rocket&logoColor=white)](https://trueforge.dev)
+[![Code Review: Qodo AI](https://img.shields.io/badge/Code_Review-Qodo_AI_Verified-10B981?style=flat-square&logo=github&logoColor=white)](https://qodo.ai)
+[![Models: Gemini 3.1](https://img.shields.io/badge/Models-Gemini_3.1_Pro_%7C_Flash-6366F1?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev)
+[![Sandbox: Daytona](https://img.shields.io/badge/Sandbox-Daytona_Isolated-0891B2?style=flat-square&logo=docker&logoColor=white)](https://daytona.io)
+[![Safety: HITL Gate](https://img.shields.io/badge/Safety_Gate-HITL_Enforced-D97706?style=flat-square&logo=auth0&logoColor=white)](#formal-safety-invariants--hitl-gate)
+[![CI Status](https://img.shields.io/badge/CI-Passing-16A34A?style=flat-square&logo=githubactions&logoColor=white)](https://github.com/Anurag-tech22/bomb-squad-agent/actions)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-CA8A04?style=flat-square)](LICENSE)
 
 ---
 
