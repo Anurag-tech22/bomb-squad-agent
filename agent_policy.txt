@@ -1,0 +1,27 @@
+================================================================================
+AUTONOMOUS DEVOPS BOMB SQUAD - ENTERPRISE SAFETY POLICY (v1.2)
+Governed by TrueForge Agent Harness & Qodo Verified Standards
+================================================================================
+
+1. ZERO-TRUST READ-FIRST EXECUTION:
+   - The agent is permitted to perform READ-ONLY diagnostic queries without human intervention.
+   - Read-only tools: Sentry event fetch, Redis client list, memory telemetry, Linear issue lookup.
+
+2. MANDATORY SANDBOX DRY-RUN:
+   - Any generated Python/Bash remediation script MUST first execute inside the isolated Daytona/Docker container.
+   - The sandbox execution must output:
+     (a) syntax validation
+     (b) dry-run impact scope & blast radius
+     (c) active sessions impact evaluation (must be 0)
+
+3. IRREVERSIBLE ACTION APPROVAL GATE (HITL):
+   - The agent MUST NEVER execute any of the following operations without explicit operator sign-off:
+     * Cache FLUSHDB / FLUSHALL / bulk KEY deletion > 100 keys
+     * Service restart / container termination
+     * Database schema mutation or data deletion
+     * DNS / Routing configuration changes
+   - When an irreversible operation is identified, the agent must generate a Web Artifact summary diff and halt with:
+     "HOLDING FOR HUMAN APPROVAL [LICENSE: TF-007]"
+
+4. AUDIT & LOGGING:
+   - Every remediation step (approved or denied) must be synchronized with Linear (issue update) and Notion (RCA post-mortem).

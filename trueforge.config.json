@@ -1,0 +1,44 @@
+{
+  "$schema": "https://trueforge.dev/schemas/agent-config.json",
+  "version": "1.0.0",
+  "agent": {
+    "name": "DevOps Bomb Squad Agent",
+    "description": "Enterprise-grade zero-trust autonomous incident remediation agent with HITL approval gate",
+    "primary_model": "gemini-3-1-pro-preview",
+    "fallback_model": "gemini-3-6-flash",
+    "instructions_path": "./agent_instructions.txt",
+    "policy_path": "./agent_policy.txt"
+  },
+  "sandbox": {
+    "provider": "daytona",
+    "image": "python:3.11-slim",
+    "isolation_level": "strict",
+    "network_egress": "denied",
+    "timeout_seconds": 60
+  },
+  "mcp_servers": {
+    "cache-cleaner": {
+      "command": "python",
+      "args": ["-m", "src.mcp_servers.cache_cleaner_server"],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  },
+  "safety_gates": {
+    "human_in_the_loop": {
+      "enforce_on_tools": [
+        "execute_eviction",
+        "service_restart",
+        "cloud_infra_mutate"
+      ],
+      "approval_token_prefix": "TF-007",
+      "require_ui_diff_preview": true
+    }
+  },
+  "integrations": {
+    "telemetry": "sentry",
+    "issue_tracker": "linear",
+    "knowledge_base": "notion"
+  }
+}
