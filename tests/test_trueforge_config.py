@@ -22,8 +22,24 @@ class TestTrueForgeConfiguration:
         assert data["version"] == "1.0.0"
         assert "agent" in data
         assert "sandbox" in data
+        assert "subagents" in data
+        assert "session" in data
         assert "mcp_servers" in data
         assert "safety_gates" in data
+
+    def test_subagents_and_session_persistence(self) -> None:
+        """Validate subagent specialization and reconnect persistence settings."""
+        with open("trueforge.config.json", encoding="utf-8") as f:
+            data = json.load(f)
+
+        subagents = data["subagents"]
+        assert "triage-subagent" in subagents
+        assert "sandbox-blast-radius-subagent" in subagents
+        assert "reconciliation-subagent" in subagents
+
+        session = data["session"]
+        assert session["persistence"] == "sqlite"
+        assert session["reconnect_resumption"] is True
 
     def test_safety_gates_enforcement_rules(self) -> None:
         """Validate safety gates mandate HITL approval for dangerous operations."""

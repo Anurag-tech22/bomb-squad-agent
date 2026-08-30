@@ -16,6 +16,28 @@
     "network_egress": "denied",
     "timeout_seconds": 60
   },
+  "subagents": {
+    "triage-subagent": {
+      "role": "Telemetry Diagnostics Specialist",
+      "model": "gemini-3-6-flash",
+      "tools": ["cache-cleaner/inspect_cache_health"]
+    },
+    "sandbox-blast-radius-subagent": {
+      "role": "Daytona Sandbox Safety Evaluator",
+      "model": "gemini-3-1-pro-preview",
+      "tools": ["cache-cleaner/dry_run_remediation"]
+    },
+    "reconciliation-subagent": {
+      "role": "Post-Mortem & Ticket Closure Sync",
+      "model": "gemini-3-6-flash",
+      "tools": []
+    }
+  },
+  "session": {
+    "persistence": "sqlite",
+    "reconnect_resumption": true,
+    "state_checkpoint_interval_seconds": 5
+  },
   "mcp_servers": {
     "cache-cleaner": {
       "command": "python",
