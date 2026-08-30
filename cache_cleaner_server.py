@@ -1,5 +1,6 @@
 """
 Autonomous DevOps Bomb Squad - Cache Remediation MCP Server (Root Entrypoint)
+Provides type-safe diagnostics, dry-run simulations, and HITL-governed key eviction.
 """
 
 from src.mcp_servers.cache_cleaner_server import (
@@ -7,6 +8,10 @@ from src.mcp_servers.cache_cleaner_server import (
     dry_run_remediation_impl,
     execute_eviction_impl,
     MOCK_CACHE_REGISTRY,
+    REQUIRED_APPROVAL_TOKEN,
+    BombSquadError,
+    HITLConfirmationRequiredError,
+    InvalidApprovalTokenError,
 )
 
 try:
