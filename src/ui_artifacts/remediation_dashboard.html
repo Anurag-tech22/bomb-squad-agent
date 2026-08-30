@@ -3,349 +3,916 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Autonomous DevOps Bomb Squad — Remediation Telemetry</title>
+  <title>Bomb Squad — Mission Control</title>
+  <meta name="description" content="Zero-Trust Autonomous DevOps Incident Remediation Dashboard — TrueForge Agent Harness">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-primary: #090d16;
-      --bg-surface: #111827;
-      --bg-card: rgba(17, 24, 39, 0.85);
-      --border-color: #1f293d;
-      --accent-danger: #ef4444;
-      --accent-danger-glow: rgba(239, 68, 68, 0.2);
-      --accent-success: #10b981;
-      --accent-success-glow: rgba(16, 185, 129, 0.2);
-      --accent-cyan: #06b6d4;
-      --accent-cyan-glow: rgba(6, 182, 212, 0.15);
-      --accent-amber: #f59e0b;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
+      --bg-base:      #060a12;
+      --bg-surface:   #0c1220;
+      --bg-card:      rgba(15, 23, 42, 0.9);
+      --bg-code:      #0d1117;
+      --border:       rgba(99, 120, 160, 0.15);
+      --border-glow:  rgba(99, 120, 160, 0.35);
+
+      --red:          #f43f5e;
+      --red-glow:     rgba(244, 63, 94, 0.18);
+      --red-dim:      rgba(244, 63, 94, 0.08);
+      --amber:        #f59e0b;
+      --amber-glow:   rgba(245, 158, 11, 0.15);
+      --green:        #10b981;
+      --green-glow:   rgba(16, 185, 129, 0.15);
+      --cyan:         #22d3ee;
+      --cyan-glow:    rgba(34, 211, 238, 0.12);
+      --violet:       #a78bfa;
+      --violet-glow:  rgba(167, 139, 250, 0.12);
+      --blue:         #3b82f6;
+
+      --text-1: #f1f5f9;
+      --text-2: #94a3b8;
+      --text-3: #475569;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background-color: var(--bg-primary);
-      color: var(--text-main);
-      padding: 24px;
-      line-height: 1.5;
+      background: var(--bg-base);
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    .container {
-      max-width: 920px;
-      margin: 0 auto;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 28px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(12px);
+    /* ── Grid noise overlay ──────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(34,211,238,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,.025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .header {
+    main { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    /* ── Top Nav Bar ─────────────────────────────────────────── */
+    .topbar {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 20px;
-      margin-bottom: 24px;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(6,10,18,0.95);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
 
-    .title-group h1 {
-      font-size: 1.4rem;
-      font-weight: 700;
+    .topbar-brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      color: var(--text-1);
+    }
+
+    .topbar-brand .icon { font-size: 1.25rem; }
+
+    .topbar-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.78rem;
+      color: var(--text-2);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: blink 1.2s ease-in-out infinite;
+      box-shadow: 0 0 6px var(--green);
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* ── Page Header ─────────────────────────────────────────── */
+    .page-header {
+      margin: 32px 0 28px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+    }
+
+    .page-header h1 span { color: var(--cyan); }
+
+    .page-header p {
+      font-size: 0.875rem;
+      color: var(--text-2);
+      margin-top: 4px;
     }
 
     .badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: 9999px;
-      font-size: 0.75rem;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: 999px;
+      font-size: 0.7rem;
       font-weight: 600;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      white-space: nowrap;
     }
 
-    .badge-critical {
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      animation: pulse 2s infinite;
-    }
+    .badge-critical { background: var(--red-dim); color: var(--red); border: 1px solid rgba(244,63,94,.3); animation: blink 1.5s infinite; }
+    .badge-healthy  { background: var(--green-glow); color: var(--green); border: 1px solid rgba(16,185,129,.3); }
+    .badge-sandbox  { background: var(--cyan-glow); color: var(--cyan); border: 1px solid rgba(34,211,238,.3); }
+    .badge-hitl     { background: var(--amber-glow); color: var(--amber); border: 1px solid rgba(245,158,11,.3); }
+    .badge-resolved { background: var(--green-glow); color: var(--green); border: 1px solid rgba(16,185,129,.35); }
 
-    .badge-sandbox {
-      background: var(--accent-cyan-glow);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(6, 182, 212, 0.3);
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.6; }
-    }
-
-    .grid-stats {
+    /* ── KPI Grid ────────────────────────────────────────────── */
+    .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 14px;
+      margin-bottom: 28px;
     }
 
-    .stat-card {
+    .kpi-card {
       background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 16px;
-    }
-
-    .stat-label {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 6px;
-    }
-
-    .stat-val {
-      font-size: 1.5rem;
-      font-weight: 700;
-      font-family: 'Fira Code', monospace;
-    }
-
-    .stat-val.danger { color: var(--accent-danger); }
-    .stat-val.cyan { color: var(--accent-cyan); }
-    .stat-val.success { color: var(--accent-success); }
-
-    .section-title {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .diff-box {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 16px;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.85rem;
-      margin-bottom: 24px;
-      overflow-x: auto;
-    }
-
-    .diff-line {
-      display: flex;
-      gap: 12px;
-      padding: 3px 0;
-    }
-
-    .diff-add { color: #3fb950; }
-    .diff-del { color: #f85149; }
-    .diff-neutral { color: #8b949e; }
-
-    .approval-gate {
-      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(239, 68, 68, 0.05) 100%);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 20px;
-      margin-top: 10px;
+      padding: 18px 20px;
+      backdrop-filter: blur(8px);
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
     }
 
-    .approval-header {
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .kpi-card.danger::before  { background: var(--red-dim); }
+    .kpi-card.success::before { background: var(--green-glow); }
+    .kpi-card.cyan::before    { background: var(--cyan-glow); }
+    .kpi-card.amber::before   { background: var(--amber-glow); }
+    .kpi-card::before         { opacity: 1; }
+
+    .kpi-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-2);
+      margin-bottom: 8px;
+    }
+
+    .kpi-val {
+      font-family: 'Fira Code', monospace;
+      font-size: 1.9rem;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .kpi-val.danger  { color: var(--red); text-shadow: 0 0 20px var(--red); }
+    .kpi-val.success { color: var(--green); text-shadow: 0 0 20px var(--green); }
+    .kpi-val.cyan    { color: var(--cyan); text-shadow: 0 0 20px var(--cyan); }
+    .kpi-val.amber   { color: var(--amber); text-shadow: 0 0 20px var(--amber); }
+
+    .kpi-sub { font-size: 0.75rem; color: var(--text-3); margin-top: 5px; }
+
+    /* ── Cards / Sections ────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
 
-    .approval-title {
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: #fbbf24;
+    .card-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-2);
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
-    .token-pill {
-      background: #1e293b;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.75rem;
-      color: #94a3b8;
-      border: 1px solid #334155;
-    }
-
-    .approval-desc {
-      font-size: 0.88rem;
-      color: #d1d5db;
-      margin-bottom: 18px;
-    }
-
-    .action-buttons {
+    /* ── Pipeline Phases ─────────────────────────────────────── */
+    .phases {
       display: flex;
-      gap: 12px;
+      align-items: stretch;
+      gap: 0;
+      margin-bottom: 28px;
+      overflow-x: auto;
+      padding-bottom: 4px;
     }
+
+    .phase {
+      flex: 1;
+      min-width: 140px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 16px 14px;
+      text-align: center;
+      position: relative;
+      cursor: default;
+      transition: background 0.25s;
+    }
+
+    .phase:first-child { border-radius: 12px 0 0 12px; }
+    .phase:last-child  { border-radius: 0 12px 12px 0; }
+
+    .phase.active {
+      background: rgba(34,211,238,0.06);
+      border-color: rgba(34,211,238,0.4);
+    }
+
+    .phase.done {
+      background: rgba(16,185,129,0.05);
+      border-color: rgba(16,185,129,0.25);
+    }
+
+    .phase.pending {
+      opacity: 0.45;
+    }
+
+    .phase-num {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-3);
+      margin-bottom: 6px;
+    }
+
+    .phase-icon { font-size: 1.4rem; margin-bottom: 6px; display: block; }
+
+    .phase-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-2);
+      line-height: 1.3;
+    }
+
+    .phase.done  .phase-label  { color: var(--green); }
+    .phase.active .phase-label { color: var(--cyan); }
+
+    .phase-status {
+      font-size: 0.65rem;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    .phase.done  .phase-status { color: var(--green); }
+    .phase.active .phase-status { color: var(--amber); }
+
+    /* ── Registry Table ──────────────────────────────────────── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px 12px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-3);
+      border-bottom: 1px solid var(--border);
+      font-weight: 500;
+    }
+
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(99,120,160,0.07);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--text-2);
+      vertical-align: middle;
+    }
+
+    tr.poison td { background: rgba(244,63,94,0.04); }
+    tr.poison td:first-child { color: var(--red); }
+
+    tr.session td:first-child { color: var(--green); }
+    tr.evicted td { opacity: 0.4; text-decoration: line-through; }
+
+    .type-chip {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .type-session { background: rgba(16,185,129,.12); color: var(--green); }
+    .type-poison  { background: rgba(244,63,94,.12);  color: var(--red); }
+    .type-stale   { background: rgba(245,158,11,.12); color: var(--amber); }
+    .type-query   { background: rgba(34,211,238,.10); color: var(--cyan); }
+
+    /* ── HITL Gate ───────────────────────────────────────────── */
+    .hitl-card {
+      background: linear-gradient(135deg, rgba(245,158,11,.06) 0%, rgba(244,63,94,.04) 100%);
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .hitl-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hitl-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .token-input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      min-width: 220px;
+      background: var(--bg-code);
+      border: 1px solid var(--border-glow);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-1);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus { border-color: var(--amber); }
 
     .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s;
+      white-space: nowrap;
     }
+
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn-approve {
-      background: #10b981;
-      color: #042f2e;
-    }
-    .btn-approve:hover {
-      background: #059669;
-      box-shadow: 0 0 15px var(--accent-success-glow);
+      background: rgba(16,185,129,.15);
+      color: var(--green);
+      border-color: rgba(16,185,129,.4);
     }
 
-    .btn-abort {
-      background: #374151;
-      color: #f3f4f6;
-    }
-    .btn-abort:hover {
-      background: #4b5563;
+    .btn-approve:not(:disabled):hover {
+      background: rgba(16,185,129,.25);
+      box-shadow: 0 0 14px rgba(16,185,129,.3);
+      transform: translateY(-1px);
     }
 
-    .status-feedback {
-      margin-top: 14px;
-      padding: 12px;
-      border-radius: 8px;
+    .btn-reject {
+      background: rgba(244,63,94,.1);
+      color: var(--red);
+      border-color: rgba(244,63,94,.3);
+    }
+
+    .btn-reject:not(:disabled):hover {
+      background: rgba(244,63,94,.2);
+      box-shadow: 0 0 14px rgba(244,63,94,.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-run {
+      background: rgba(34,211,238,.1);
+      color: var(--cyan);
+      border-color: rgba(34,211,238,.3);
+    }
+
+    .btn-run:not(:disabled):hover {
+      background: rgba(34,211,238,.2);
+      box-shadow: 0 0 14px rgba(34,211,238,.25);
+      transform: translateY(-1px);
+    }
+
+    /* ── Log Terminal ────────────────────────────────────────── */
+    .terminal {
+      background: var(--bg-code);
+      border: 1px solid rgba(55,65,81,0.7);
+      border-radius: 10px;
+      padding: 16px;
       font-family: 'Fira Code', monospace;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
+      line-height: 1.75;
+      max-height: 260px;
+      overflow-y: auto;
+      color: #8b949e;
+    }
+
+    .log-info    { color: #58a6ff; }
+    .log-success { color: var(--green); }
+    .log-warning { color: var(--amber); }
+    .log-error   { color: var(--red); }
+    .log-dim     { color: #3d4451; }
+
+    /* ── Outcome Panel ───────────────────────────────────────── */
+    #outcome-panel {
       display: none;
+      background: linear-gradient(135deg, rgba(16,185,129,.08), rgba(34,211,238,.05));
+      border: 1px solid rgba(16,185,129,.35);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin-bottom: 20px;
+    }
+
+    .outcome-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    .outcome-item {
+      font-size: 0.8rem;
+      color: var(--text-2);
+    }
+
+    .outcome-item strong {
+      display: block;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-3);
+      margin-bottom: 3px;
+    }
+
+    .outcome-item span { font-family: 'Fira Code', monospace; color: var(--green); }
+
+    /* ── Scrollbar ───────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(99,120,160,.3); border-radius: 3px; }
+
+    /* ── Responsive ──────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .page-header h1 { font-size: 1.35rem; }
+      .kpi-val { font-size: 1.5rem; }
+      .phases { flex-wrap: nowrap; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="title-group">
-        <h1><span>💣</span> DevOps Bomb Squad Incident Response</h1>
-      </div>
-      <div style="display: flex; gap: 8px;">
-        <span class="badge badge-critical">● Sentry Alert: High</span>
-        <span class="badge badge-sandbox">⚡ Daytona Sandbox</span>
-      </div>
-    </div>
 
-    <!-- Telemetry Stats -->
-    <div class="grid-stats">
-      <div class="stat-card">
-        <div class="stat-label">Cache Memory Load</div>
-        <div class="stat-val danger" id="mem-val">263.6 MB</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Deadlock Leak Keys</div>
-        <div class="stat-val danger" id="leak-val">2 Keys (218 MB)</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Active User Sessions</div>
-        <div class="stat-val success" id="session-val">3 Protected (0 Impact)</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Dry Run Safety Verification</div>
-        <div class="stat-val cyan">100% PASSED</div>
-      </div>
-    </div>
+<!-- Top Navigation Bar -->
+<nav class="topbar" id="topbar">
+  <div class="topbar-brand">
+    <span class="icon">💣</span>
+    Bomb Squad — Mission Control
+  </div>
+  <div class="topbar-meta">
+    <span class="live-dot" id="live-dot"></span>
+    <span id="session-id">SESSION: INITIALIZING</span>
+    <span>|</span>
+    <span id="clock">--:--:--</span>
+  </div>
+</nav>
 
-    <!-- Blast Radius & Dry-Run Diff -->
-    <div class="section-title">🔍 Sandbox Dry-Run Impact Telemetry</div>
-    <div class="diff-box">
-      <div class="diff-line diff-neutral"><span>[DAYTONA CONTAINER] Executing dry_run_remediation('leak:*')</span></div>
-      <div class="diff-line diff-del"><span>- EVICT [UNEXPIRING] leak:deadlock_lock_4481 (120.4 MB)</span></div>
-      <div class="diff-line diff-del"><span>- EVICT [UNEXPIRING] leak:deadlock_lock_4482 (98.2 MB)</span></div>
-      <div class="diff-line diff-add"><span>+ PRESERVE [TTL: 3600s] session:user_101 (4.0 KB)</span></div>
-      <div class="diff-line diff-add"><span>+ PRESERVE [TTL: 1800s] session:user_102 (6.0 KB)</span></div>
-      <div class="diff-line diff-add"><span>+ PRESERVE [TTL: 7200s] session:user_103 (5.0 KB)</span></div>
-      <div class="diff-line diff-neutral"><span>[SAFETY AUDIT] Net Memory Reclaimed: 218.6 MB | Active Sessions Evicted: 0</span></div>
-    </div>
+<main>
 
-    <!-- Human-in-the-Loop Approval Gate -->
-    <div class="approval-gate" id="gate-container">
-      <div class="approval-header">
-        <div class="approval-title">
-          <span>⚠️</span> Human-in-the-Loop (HITL) Checkpoint
-        </div>
-        <div class="token-pill">TOKEN: TF-007-EVIC-REQ</div>
-      </div>
-      <p class="approval-desc">
-        Targeted cache key eviction is an irreversible infrastructure mutation. The TrueForge harness has suspended execution and awaits operator authorization before executing <code>execute_eviction()</code>.
-      </p>
-      <div class="action-buttons" id="btn-group">
-        <button class="btn btn-approve" onclick="handleApprove()">
-          ✓ Approve Remediation (License TF-007)
-        </button>
-        <button class="btn btn-abort" onclick="handleAbort()">
-          ✕ Abort Action
-        </button>
-      </div>
-      <div class="status-feedback" id="feedback"></div>
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <h1>Incident Remediation <span>Mission TF-007</span></h1>
+      <p>Zero-Trust Autonomous Cache Recovery · TrueForge × Qodo Agent Harness</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span class="badge badge-critical" id="status-badge">● CRITICAL</span>
+      <span class="badge badge-sandbox">Daytona Sandbox</span>
     </div>
   </div>
 
-  <script>
-    function handleApprove() {
-      const feedback = document.getElementById('feedback');
-      const btnGroup = document.getElementById('btn-group');
-      const memVal = document.getElementById('mem-val');
-      const leakVal = document.getElementById('leak-val');
+  <!-- KPI Grid -->
+  <div class="kpi-grid">
+    <div class="kpi-card danger">
+      <div class="kpi-label">Poisoned Keys</div>
+      <div class="kpi-val danger" id="kpi-poison">3</div>
+      <div class="kpi-sub">deadlock / OOM threats</div>
+    </div>
+    <div class="kpi-card amber">
+      <div class="kpi-label">Memory Used</div>
+      <div class="kpi-val amber" id="kpi-mem">257.44 MB</div>
+      <div class="kpi-sub">across 6 keys</div>
+    </div>
+    <div class="kpi-card cyan">
+      <div class="kpi-label">Blast Radius</div>
+      <div class="kpi-val cyan" id="kpi-evict">2 keys</div>
+      <div class="kpi-sub">safe eviction candidates</div>
+    </div>
+    <div class="kpi-card success">
+      <div class="kpi-label">Session Safety</div>
+      <div class="kpi-val success" id="kpi-sessions">3 Safe</div>
+      <div class="kpi-sub">zero sessions at risk</div>
+    </div>
+  </div>
 
-      btnGroup.style.display = 'none';
-      feedback.style.display = 'block';
-      feedback.style.background = 'rgba(16, 185, 129, 0.15)';
-      feedback.style.color = '#34d399';
-      feedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-      feedback.innerHTML = '⚡ [APPROVED BY OPERATOR]: Token TF-007-EVIC-REQ confirmed.<br>✓ Evicted 2 deadlock keys (218.6 MB reclaimed).<br>✓ Sentry alert resolved.<br>✓ Linear ticket closed & Notion RCA post-mortem synchronized.';
-      
-      memVal.className = 'stat-val success';
-      memVal.innerText = '45.0 MB';
-      leakVal.className = 'stat-val success';
-      leakVal.innerText = '0 Keys (0 MB)';
+  <!-- 5-Phase Mission Pipeline -->
+  <div class="phases" id="phases">
+    <div class="phase done" id="ph-1">
+      <div class="phase-num">Phase 1</div>
+      <span class="phase-icon">🔍</span>
+      <div class="phase-label">Telemetry Triage</div>
+      <div class="phase-status">✓ Complete</div>
+    </div>
+    <div class="phase done" id="ph-2">
+      <div class="phase-num">Phase 2</div>
+      <span class="phase-icon">📦</span>
+      <div class="phase-label">Sandbox Dry-Run</div>
+      <div class="phase-status">✓ Complete</div>
+    </div>
+    <div class="phase active" id="ph-3">
+      <div class="phase-num">Phase 3</div>
+      <span class="phase-icon">🛑</span>
+      <div class="phase-label">HITL Gate</div>
+      <div class="phase-status">⏳ Awaiting</div>
+    </div>
+    <div class="phase pending" id="ph-4">
+      <div class="phase-num">Phase 4</div>
+      <span class="phase-icon">⚡</span>
+      <div class="phase-label">Eviction</div>
+      <div class="phase-status">Locked</div>
+    </div>
+    <div class="phase pending" id="ph-5">
+      <div class="phase-num">Phase 5</div>
+      <span class="phase-icon">📋</span>
+      <div class="phase-label">Sync & Close</div>
+      <div class="phase-status">Pending</div>
+    </div>
+  </div>
+
+  <!-- Cache Registry Table -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">🗄️ Live Cache Registry</div>
+      <span class="badge badge-hitl">6 total keys</span>
+    </div>
+    <div class="table-wrap">
+      <table id="registry-table">
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Type</th>
+            <th>Size</th>
+            <th>TTL</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="registry-body">
+          <!-- populated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- HITL Approval Gate -->
+  <div class="hitl-card">
+    <div class="hitl-header">
+      <div class="hitl-title">
+        🛑 Human-in-the-Loop Approval Gate
+        <span class="badge badge-hitl">AWAITING OPERATOR</span>
+      </div>
+    </div>
+    <p style="font-size:0.82rem;color:var(--text-2);margin-bottom:16px;">
+      The agent has computed a safe eviction plan. State mutation is cryptographically blocked until an authorized operator provides the correct token and explicit confirmation.
+    </p>
+    <div class="token-input-row">
+      <input type="text" id="token-input" placeholder="Enter operator token (e.g. TF-007-EVIC-REQ)" autocomplete="off" spellcheck="false">
+      <button class="btn btn-approve" id="btn-approve" onclick="handleApprove()">✅ Approve &amp; Execute</button>
+      <button class="btn btn-reject" id="btn-reject" onclick="handleReject()">❌ Reject</button>
+    </div>
+    <p style="font-size:0.72rem;color:var(--text-3);">
+      Correct token: <code style="color:var(--amber);">TF-007-EVIC-REQ</code> · Pattern: <code style="color:var(--cyan);">leak:*</code> · Keys to evict: <code style="color:var(--red);">2</code>
+    </p>
+  </div>
+
+  <!-- Outcome Panel (shown after resolution) -->
+  <div id="outcome-panel">
+    <div style="display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;margin-bottom:4px;">
+      ✅ Incident Resolved — Mission TF-007 Complete
+      <span class="badge badge-resolved">RESOLVED</span>
+    </div>
+    <p style="font-size:0.8rem;color:var(--text-2);margin-bottom:2px;">All poisoned keys evicted · Active user sessions preserved · Incident closed</p>
+    <div class="outcome-grid" id="outcome-grid"></div>
+  </div>
+
+  <!-- Agent Log Terminal -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">⌨️ Agent Execution Log</div>
+      <button class="btn btn-run" onclick="rerunTriage()" id="btn-retriage">⟳ Re-run Triage</button>
+    </div>
+    <div class="terminal" id="log-terminal"></div>
+  </div>
+
+</main>
+
+<script>
+  /* ── Constants ─────────────────────────────────────────── */
+  const CORRECT_TOKEN = 'TF-007-EVIC-REQ';
+
+  const REGISTRY_DATA = [
+    { key: 'leak:deadlock_lock_4481', type: 'poison_lock',  size: '102400 KB', ttl: '-1 (no-expire)', danger: true },
+    { key: 'leak:deadlock_lock_4482', type: 'poison_lock',  size: '108032 KB', ttl: '-1 (no-expire)', danger: true },
+    { key: 'stale:batch_job_9912',    type: 'stale_batch',  size: '51200 KB',  ttl: '1800s', danger: true },
+    { key: 'session:user_101',        type: 'active_session', size: '512 KB',  ttl: '3600s', danger: false },
+    { key: 'session:user_102',        type: 'active_session', size: '480 KB',  ttl: '3600s', danger: false },
+    { key: 'session:user_103',        type: 'active_session', size: '460 KB',  ttl: '3600s', danger: false },
+  ];
+
+  const TYPE_CHIPS = {
+    poison_lock:    '<span class="type-chip type-poison">poison_lock</span>',
+    stale_batch:    '<span class="type-chip type-stale">stale_batch</span>',
+    active_session: '<span class="type-chip type-session">active_session</span>',
+    transient_query:'<span class="type-chip type-query">transient_query</span>',
+  };
+
+  /* ── Clock ─────────────────────────────────────────────── */
+  const sessionId = 'TF-SESSION-' + Math.floor(Date.now() / 1000);
+  document.getElementById('session-id').textContent = 'SESSION: ' + sessionId;
+
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB');
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* ── Populate Registry Table ────────────────────────────── */
+  function buildRegistryTable(evictedKeys = []) {
+    const tbody = document.getElementById('registry-body');
+    tbody.innerHTML = '';
+    REGISTRY_DATA.forEach(row => {
+      const evicted = evictedKeys.includes(row.key);
+      const cls = evicted ? 'evicted' : (row.type === 'active_session' ? 'session' : (row.danger ? 'poison' : ''));
+      const status = evicted
+        ? '<span style="color:var(--text-3)">evicted</span>'
+        : row.danger
+          ? '<span style="color:var(--red)">⚠ threat</span>'
+          : '<span style="color:var(--green)">✓ protected</span>';
+      tbody.innerHTML += `<tr class="${cls}">
+        <td>${row.key}</td>
+        <td>${TYPE_CHIPS[row.type] || row.type}</td>
+        <td>${row.size}</td>
+        <td>${row.ttl}</td>
+        <td>${status}</td>
+      </tr>`;
+    });
+  }
+
+  buildRegistryTable();
+
+  /* ── Logger ─────────────────────────────────────────────── */
+  const terminal = document.getElementById('log-terminal');
+
+  function log(msg, cls = '') {
+    const ts = new Date().toLocaleTimeString('en-GB');
+    const el = document.createElement('div');
+    el.innerHTML = `<span class="log-dim">${ts}</span>  <span class="${cls}">${msg}</span>`;
+    terminal.appendChild(el);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  /* ── Boot Sequence Log ─────────────────────────────────── */
+  function bootLog() {
+    const entries = [
+      ['[INFO]  TrueForge Harness Runtime initialized · ' + sessionId, 'log-info'],
+      ['[INFO]  Loading trueforge.config.json manifest v1.0.0', 'log-info'],
+      ['[INFO]  Primary model: gemini-3.1-pro-preview · Fallback: gemini-3.6-flash', ''],
+      ['', ''],
+      ['[PHASE 1] FastMCP Telemetry Triage', 'log-info'],
+      ['[INFO]  Querying cache cluster via inspect_cache_health tool...', 'log-info'],
+      ['[WARN]  Cache health CRITICAL: 3 poisoned key(s) detected.', 'log-warning'],
+      ['[INFO]  Total keys: 6 · Memory: 257.44 MB · Fragmentation: 3.14x', ''],
+      ['', ''],
+      ['[PHASE 2] Daytona Ephemeral Sandbox Dry-Run', 'log-info'],
+      ['[INFO]  Spawning isolated sandbox (network_egress: denied)...', 'log-info'],
+      ['[INFO]  Pattern: leak:* · Matched: 2 · Reclaimable: 213.48 MB', ''],
+      ['[INFO]  Active sessions at risk: 0 ✓ (safety gate passed)', 'log-success'],
+      ['[INFO]  HITL approval required: true', ''],
+      ['', ''],
+      ['[PHASE 3] Cryptographic HITL Gate', 'log-info'],
+      ['[WARN]  Execution HALTED — awaiting operator authorization token.', 'log-warning'],
+    ];
+
+    let i = 0;
+    function next() {
+      if (i < entries.length) {
+        const [msg, cls] = entries[i++];
+        if (msg) log(msg, cls);
+        else terminal.appendChild(document.createElement('div'));
+        setTimeout(next, 80);
+      }
+    }
+    next();
+  }
+
+  bootLog();
+
+  /* ── Phase Progress ─────────────────────────────────────── */
+  function setPhase(n) {
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById('ph-' + i);
+      el.className = 'phase ' + (i < n ? 'done' : i === n ? 'active' : 'pending');
+      const statusEl = el.querySelector('.phase-status');
+      if (i < n)  statusEl.textContent = '✓ Complete';
+      if (i === n) statusEl.textContent = i === 5 ? '✓ Complete' : '⏳ In progress';
+      if (i > n)  statusEl.textContent = 'Locked';
+    }
+  }
+
+  /* ── HITL Actions ────────────────────────────────────────── */
+  function handleApprove() {
+    const token = document.getElementById('token-input').value.trim();
+
+    if (!token) {
+      log('[ERROR] No token provided. Authorization denied.', 'log-error');
+      return;
     }
 
-    function handleAbort() {
-      const feedback = document.getElementById('feedback');
-      const btnGroup = document.getElementById('btn-group');
-
-      btnGroup.style.display = 'none';
-      feedback.style.display = 'block';
-      feedback.style.background = 'rgba(239, 68, 68, 0.15)';
-      feedback.style.color = '#f87171';
-      feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-      feedback.innerHTML = '⛔ [OPERATOR ABORT]: Eviction cancelled. No changes were applied to production cache.';
+    if (token !== CORRECT_TOKEN) {
+      log(`[ERROR] Invalid token: "${token}". Authorization REJECTED (ERR_INVALID_TOKEN).`, 'log-error');
+      log('[WARN]  State mutation BLOCKED. No keys evicted.', 'log-warning');
+      shakeCard();
+      return;
     }
-  </script>
+
+    /* ── Valid token — proceed ─── */
+    document.getElementById('btn-approve').disabled = true;
+    document.getElementById('btn-reject').disabled  = true;
+
+    log('', '');
+    log('[PHASE 3] Operator token verified: ' + token, 'log-success');
+    log('[INFO]  Human confirmation received. HITL gate CLEARED.', 'log-success');
+
+    setPhase(4);
+
+    setTimeout(() => {
+      log('', '');
+      log('[PHASE 4] Executing authorized cache eviction...', 'log-info');
+      log('[INFO]  Evicting: leak:deadlock_lock_4481 (102400 KB)', '');
+      log('[INFO]  Evicting: leak:deadlock_lock_4482 (108032 KB)', '');
+      log('[INFO]  Active sessions verified safe — NOT evicting session:user_*', 'log-success');
+
+      setTimeout(() => {
+        log('[INFO]  Eviction RESOLVED: 2 keys removed · 43.96 MB remaining.', 'log-success');
+        buildRegistryTable(['leak:deadlock_lock_4481', 'leak:deadlock_lock_4482']);
+
+        document.getElementById('kpi-poison').textContent = '1';
+        document.getElementById('kpi-mem').textContent = '43.96 MB';
+        document.getElementById('kpi-evict').textContent = '2 evicted';
+        document.getElementById('status-badge').className = 'badge badge-healthy';
+        document.getElementById('status-badge').textContent = '● RESOLVED';
+
+        setPhase(5);
+
+        setTimeout(() => {
+          log('', '');
+          log('[PHASE 5] Closed-loop enterprise sync...', 'log-info');
+          log('[INFO]  Linear issue #INC-4481 → CLOSED', '');
+          log('[INFO]  Notion RCA document → READY', '');
+          log('[INFO]  Sentry alert → RESOLVED', '');
+          log('', '');
+          log('[ ✓ ] MISSION TF-007 COMPLETE — All objectives achieved.', 'log-success');
+
+          showOutcome();
+        }, 800);
+      }, 900);
+    }, 600);
+  }
+
+  function handleReject() {
+    document.getElementById('btn-approve').disabled = true;
+    document.getElementById('btn-reject').disabled  = true;
+    log('', '');
+    log('[PHASE 3] Operator REJECTED eviction request.', 'log-warning');
+    log('[WARN]  Agent harness ABORTED. State mutation blocked. (ERR_HITL_REQUIRED)', 'log-warning');
+    log('[INFO]  All user sessions remain intact. Cache unchanged.', 'log-info');
+    document.getElementById('status-badge').textContent = '● ABORTED';
+    document.getElementById('status-badge').style.cssText = 'background:rgba(99,120,160,.1);color:#64748b;border:1px solid #334155;animation:none';
+  }
+
+  /* ── Outcome Panel ──────────────────────────────────────── */
+  function showOutcome() {
+    const panel = document.getElementById('outcome-panel');
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const items = [
+      ['Session ID',       sessionId],
+      ['Pattern',          'leak:*'],
+      ['Keys Evicted',     '2 (leak:deadlock_lock_4481, leak:deadlock_lock_4482)'],
+      ['Memory Freed',     '213.48 MB'],
+      ['Final Memory',     '43.96 MB'],
+      ['Sessions Intact',  'session:user_101, 102, 103'],
+      ['Linear Ticket',    '#INC-4481 → CLOSED'],
+      ['Notion RCA',       'READY'],
+    ];
+
+    document.getElementById('outcome-grid').innerHTML = items.map(([k, v]) =>
+      `<div class="outcome-item"><strong>${k}</strong><span>${v}</span></div>`
+    ).join('');
+  }
+
+  /* ── Shake animation on bad token ──────────────────────── */
+  function shakeCard() {
+    const card = document.querySelector('.hitl-card');
+    card.style.animation = 'none';
+    card.style.transition = 'transform 0.1s';
+    let x = 1;
+    const shake = setInterval(() => {
+      card.style.transform = `translateX(${x * 5}px)`;
+      x *= -1;
+    }, 80);
+    setTimeout(() => { clearInterval(shake); card.style.transform = ''; }, 480);
+  }
+
+  /* ── Re-run Triage ──────────────────────────────────────── */
+  function rerunTriage() {
+    terminal.innerHTML = '';
+    document.getElementById('btn-approve').disabled = false;
+    document.getElementById('btn-reject').disabled  = false;
+    document.getElementById('token-input').value = '';
+    document.getElementById('status-badge').className = 'badge badge-critical';
+    document.getElementById('status-badge').textContent = '● CRITICAL';
+    document.getElementById('outcome-panel').style.display = 'none';
+    document.getElementById('kpi-poison').textContent = '3';
+    document.getElementById('kpi-mem').textContent    = '257.44 MB';
+    document.getElementById('kpi-evict').textContent  = '2 keys';
+    buildRegistryTable();
+    setPhase(3);
+    bootLog();
+  }
+</script>
 </body>
 </html>
