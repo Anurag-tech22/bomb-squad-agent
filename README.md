@@ -1,54 +1,49 @@
-<div align="center">
+# DevOps Bomb Squad
+> **Autonomous Zero-Trust Incident Remediation Runtime on TrueForge**
+> *Mission TF-007 • Production Infrastructure Governance & Automated SRE*
 
-# Autonomous DevOps Bomb Squad 💣🛡️
-### *Mission TF-007: Enterprise Zero-Trust Autonomous Remediation Runtime*
-
-```
-[ CLASSIFICATION: SRE TIER-1 RUNTIME ] • [ ENGINE: TRUEFORGE v1.0 ] • [ AUDIT: QODO AI VERIFIED ]
-```
-
-[![Harness: TrueForge](https://img.shields.io/badge/Agent_Harness-TrueForge_v1.0-2563EB?style=for-the-badge&logo=rocket&logoColor=white)](https://trueforge.dev)
-[![Code Review: Qodo AI](https://img.shields.io/badge/Code_Review-Qodo_AI_Verified-059669?style=for-the-badge&logo=github&logoColor=white)](https://qodo.ai)
-[![Models: Gemini 3.1 Pro](https://img.shields.io/badge/Reasoning-Gemini_3.1_Pro_%7C_Flash-7C3AED?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
-[![Sandbox: Daytona](https://img.shields.io/badge/Sandbox-Daytona_Isolated-0891B2?style=for-the-badge&logo=docker&logoColor=white)](https://daytona.io)
-[![Safety: HITL Gate](https://img.shields.io/badge/Safety_Gate-HITL_100%25_Governed-DB2777?style=for-the-badge&logo=auth0&logoColor=white)](#-formal-safety-invariants--hitl-gate)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-D97706?style=for-the-badge)](LICENSE)
+[![Harness: TrueForge](https://img.shields.io/badge/Harness-TrueForge_v1.0-1e293b?style=flat-square)](https://trueforge.dev)
+[![Review: Qodo AI](https://img.shields.io/badge/Review-Qodo_AI_Verified-1e293b?style=flat-square)](https://qodo.ai)
+[![Models: Gemini 3.1](https://img.shields.io/badge/Models-Gemini_3.1_Pro_%7C_Flash-1e293b?style=flat-square)](https://ai.google.dev)
+[![Sandbox: Daytona](https://img.shields.io/badge/Sandbox-Daytona_OCI-1e293b?style=flat-square)](https://daytona.io)
+[![Safety: HITL](https://img.shields.io/badge/Safety_Gate-HITL_Enforced-1e293b?style=flat-square)](#formal-safety-invariants--hitl-gate)
+[![CI Status](https://img.shields.io/badge/CI-Passing-1e293b?style=flat-square)](https://github.com/Anurag-tech22/bomb-squad-agent/actions)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-1e293b?style=flat-square)](LICENSE)
 
 ---
 
-| Enterprise Architecture Matrix | System Specification | Governance & Verification Standard |
+### System Specification & Governance
+
+| Subsystem | Technology Standard | Operational Role |
 | :--- | :--- | :--- |
-| **Agent Harness Runtime** | **TrueForge v1.0** (`@truefoundry/trueforge`) | Deterministic loop control, tool orchestration & HITL interception |
-| **Autonomous Code Review** | **Qodo AI Verified** | Continuous semantic PR audits, safety invariant & AST checks |
-| **Cognitive Reasoning Engine** | **Google Gemini 3.1 Pro & 3.6 Flash** | Causal multi-step root cause analysis & sub-second schema parsing |
-| **Isolated Cloud Sandbox** | **Daytona Ephemeral Containers** | Zero-network-egress containerized dry-runs and blast-radius audit |
-| **Safety Governance Gate** | **100% Deterministic HITL Gate** | Cryptographic authorization token (`TF-007-EVIC-REQ`) |
-| **Open Source Licensing** | **Apache License 2.0** | Enterprise-grade permissibility for production environments |
-
-</div>
+| **Agent Harness** | **TrueForge v1.0** (`@truefoundry/trueforge`) | Loop execution, FastMCP tool routing, and native HITL interruption. |
+| **Reasoning Core** | **Google Gemini 3.1 Pro & 3.6 Flash** | Causal multi-step diagnosis, planning, and sub-second schema parsing. |
+| **Code Review** | **Qodo AI Verified** | Continuous semantic PR audits and safety policy invariant verification. |
+| **Cloud Sandbox** | **Daytona Ephemeral Containers** | Zero-network-egress containerized dry-runs and blast-radius audit. |
+| **Safety Governance**| **Human-in-the-Loop (HITL)** | Cryptographic authorization token verification (`TF-007-EVIC-REQ`). |
+| **License** | **Apache 2.0** | Permissive enterprise open-source licensing. |
 
 ---
 
-
-## 📑 Table of Contents
-- [Executive Overview](#-executive-overview)
-- [System Architecture & Sequence Flow](#-system-architecture--sequence-flow)
-- [The TrueForge Enterprise Stack](#-the-trueforge-enterprise-stack)
-- [Formal Safety Invariants & HITL Gate](#-formal-safety-invariants--hitl-gate)
-- [Hackathon Track Alignment](#-hackathon-track-alignment)
-- [Qodo Code Review & Verification Evidence](#-qodo-code-review--verification-evidence)
-- [Performance Benchmarks & Blast Radius Analysis](#-performance-benchmarks--blast-radius-analysis)
-- [Quickstart & Enterprise Deployment](#-quickstart--enterprise-deployment)
-- [3-Minute Demo Video Script](#-3-minute-demo-video-script)
-- [Citation & Academic Reference](#-citation--academic-reference)
+## Table of Contents
+- [Executive Overview](#executive-overview)
+- [System Architecture & Sequence Flow](#system-architecture--sequence-flow)
+- [The TrueForge Enterprise Stack](#the-trueforge-enterprise-stack)
+- [Formal Safety Invariants & HITL Gate](#formal-safety-invariants--hitl-gate)
+- [Hackathon Track Alignment](#hackathon-track-alignment)
+- [Qodo Code Review Evidence](#qodo-code-review-evidence)
+- [Performance Benchmarks & Blast Radius Analysis](#performance-benchmarks--blast-radius-analysis)
+- [Quickstart & Deployment Guide](#quickstart--deployment-guide)
+- [3-Minute Demo Video Script](#3-minute-demo-video-script)
+- [Citation & Academic Reference](#citation--academic-reference)
 
 ---
 
-## 🔬 Executive Overview
+## Executive Overview
 
 When mission-critical microservices experience cascade deadlocks, runaway memory leaks, or 502 outage storms, typical automated bots either lack deep systems access or execute high-privilege destructive mutations blindly.
 
-The **Autonomous DevOps Bomb Squad Agent** (Mission `TF-007`) provides an enterprise-grade, **Zero-Trust Autonomous Remediation Runtime** built directly upon **TrueForge**:
+The **DevOps Bomb Squad Runtime** (Mission `TF-007`) provides an enterprise-grade **Zero-Trust Autonomous Remediation Engine** built directly on **TrueForge**:
 * **Live Systems Connectivity:** Directly connects to production telemetry, cache clusters, and issue trackers via typed Python **Model Context Protocol (FastMCP)** servers.
 * **Isolated Cloud Sandbox:** Executes untrusted remediation code and dynamic diagnostic scripts inside ephemeral, network-isolated **Daytona Cloud Containers**.
 * **Generative Telemetry UI:** Renders rich, interactive **Web Artifacts dashboards** displaying visual blast-radius diffs, memory reclaimed, and protected session sets.
@@ -57,42 +52,42 @@ The **Autonomous DevOps Bomb Squad Agent** (Mission `TF-007`) provides an enterp
 
 ---
 
-## 🏛️ System Architecture & Sequence Flow
+## System Architecture & Sequence Flow
 
 ### End-to-End Orchestration Topology
 
 ```mermaid
 graph TB
     subgraph ObservabilityLayer["1. Ingestion & Alerting"]
-        Alert["🚨 Sentry Alert / Ops Trigger<br/><b>502 Bad Gateway / Memory Exhaustion</b>"]
+        Alert["Sentry Alert / Telemetry Ingest<br/><b>502 Bad Gateway / Memory Exhaustion</b>"]
     end
 
     subgraph AgentRuntime["2. TrueForge Agent Harness"]
-        Engine["🧠 TrueForge Runtime Engine<br/><i>Gemini 3.1 Pro (Planning) & 3.6 Flash (Fast-Path)</i>"]
-        PolicyEngine["🛡️ Policy & Invariant Engine<br/><code>agent_instructions.txt</code> + <code>agent_policy.txt</code>"]
+        Engine["TrueForge Runtime Engine<br/><i>Gemini 3.1 Pro (Planning) & 3.6 Flash (Fast-Path)</i>"]
+        PolicyEngine["Policy & Invariant Engine<br/><code>agent_instructions.txt</code> + <code>agent_policy.txt</code>"]
         Engine <--> PolicyEngine
     end
 
     subgraph ToolRegistry["3. FastMCP Tool Interface"]
-        MCP_Diag["🔌 FastMCP: inspect_cache_health()"]
-        MCP_DryRun["🔬 FastMCP: dry_run_remediation()"]
-        MCP_Evict["⚡ FastMCP: execute_eviction()"]
+        MCP_Diag["FastMCP: inspect_cache_health()"]
+        MCP_DryRun["FastMCP: dry_run_remediation()"]
+        MCP_Evict["FastMCP: execute_eviction()"]
     end
 
     subgraph IsolatedExecution["4. Daytona Cloud Sandbox"]
-        Sandbox["📦 Daytona Ephemeral Container<br/><i>Strict Zero-Egress Network Isolation</i>"]
-        BlastRadius["🎯 Blast Radius & Safety Calculation<br/>Active Sessions Impact: 0%"]
+        Sandbox["Daytona Ephemeral Container<br/><i>Strict Zero-Egress Network Isolation</i>"]
+        BlastRadius["Blast Radius & Safety Calculation<br/>Active Sessions Impact: 0%"]
     end
 
     subgraph HITLInterface["5. Savile Row Generative UI"]
-        Dashboard["📊 Web Artifacts Telemetry Dashboard"]
-        HumanGate{"⚠️ HITL Approval Checkpoint<br/><b>Token: TF-007-EVIC-REQ</b>"}
+        Dashboard["Web Artifacts Telemetry Dashboard"]
+        HumanGate{"HITL Approval Checkpoint<br/><b>Token: TF-007-EVIC-REQ</b>"}
     end
 
     subgraph EnterpriseAudit["6. System Reconciliation"]
-        Linear["📋 Linear Ticket INC-402 (Closed)"]
-        Notion["📝 Notion Incident Post-Mortem (Published)"]
-        QodoAudit["🤖 Qodo AI Code Review Trail (Verified)"]
+        Linear["Linear Ticket INC-402 (Closed)"]
+        Notion["Notion Incident Post-Mortem (Published)"]
+        QodoAudit["Qodo AI Code Review Trail (Verified)"]
     end
 
     Alert --> Engine
@@ -104,26 +99,26 @@ graph TB
     BlastRadius --> Dashboard
     Dashboard --> HumanGate
 
-    HumanGate -->|❌ Abort / Deny| AbortNode["⛔ Safe Rollback & Audit Log"]
-    HumanGate -->|✅ Operator Approval| MCP_Evict
+    HumanGate -->|Operator Abort / Deny| AbortNode["Safe Rollback & Audit Log"]
+    HumanGate -->|Operator Authorization| MCP_Evict
 
     MCP_Evict --> Linear
     MCP_Evict --> Notion
     PolicyEngine --> QodoAudit
 ```
 
-### Detailed Sequence Diagram
+### Detailed Sequence Flow
 
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Operator as 👤 DevOps Engineer
-    participant Sentry as 🚨 Sentry APM
-    participant TrueForge as 🧠 TrueForge Harness (Gemini 3.1)
-    participant MCP as 🔌 FastMCP Cache Cleaner
-    participant Daytona as 📦 Daytona Cloud Sandbox
-    participant UI as 📊 Generative UI (Web Artifacts)
-    participant Linear as 📋 Linear / Notion Sync
+    actor Operator as DevOps Engineer
+    participant Sentry as Sentry APM
+    participant TrueForge as TrueForge Harness (Gemini 3.1)
+    participant MCP as FastMCP Cache Cleaner
+    participant Daytona as Daytona Cloud Sandbox
+    participant UI as Generative UI (Web Artifacts)
+    participant Linear as Linear / Notion Sync
 
     Sentry->>TrueForge: Dispatch Alert: Redis Memory Overload (98%)
     TrueForge->>Linear: Initialize Tracking Ticket (INC-402)
@@ -149,7 +144,7 @@ sequenceDiagram
 
 ---
 
-## ⚙️ The TrueForge Enterprise Stack
+## The TrueForge Enterprise Stack
 
 | Layer | Component | Specification | Enterprise Role |
 | :--- | :--- | :--- | :--- |
@@ -163,7 +158,7 @@ sequenceDiagram
 
 ---
 
-## 🔒 Formal Safety Invariants & HITL Gate
+## Formal Safety Invariants & HITL Gate
 
 To prevent catastrophic automated outages, the agent operates under a **deterministic zero-trust safety specification**:
 
@@ -191,58 +186,58 @@ $$\mathcal{G}(\mathcal{T}) = \text{Verified}(\tau) \land \left( \mathcal{I}(\tex
 
 ---
 
-## 🏆 Hackathon Track Alignment
+## Hackathon Track Alignment
 
-### 🥇 Double-O Track *(Best Use of TrueForge)*
-* **Deep Harness Utilization:** TrueForge acts as the operational nervous system—handling MCP tool lifecycle, coordinating with the Daytona isolated sandbox, and enforcing native execution pauses on destructive tools.
+### 1. Double-O Track *(Best Use of TrueForge)*
+* **Deep Harness Utilization:** TrueForge acts as the operational runtime—handling MCP tool lifecycle, coordinating with the Daytona isolated sandbox, and enforcing native execution pauses on destructive tools.
 * **Multi-Tool Orchestration:** Seamlessly coordinates Sentry telemetry, FastMCP memory tools, Linear issue management, and Notion knowledge capture.
 * **Fault Tolerance & Reconnects:** TrueForge maintains full session state across agent halts and asynchronous human approval checkpoints.
 
-### 🎨 Savile Row Track *(Generative UI & Visual Excellence)*
+### 2. Savile Row Track *(Generative UI & Visual Excellence)*
 * **Generative Web Artifacts:** Bypasses unreadable CLI walls-of-text by rendering a responsive, dark-mode incident telemetry dashboard (`src/ui_artifacts/remediation_dashboard.html`).
 * **Blast Radius Diff Visualizer:** Displays color-coded terminal-style diffs showing reclaimed memory vs preserved active user sessions.
 * **Interactive Approval Modal:** Real-time state updates upon operator sign-off with dynamic telemetry gauges.
 
-### 🛡️ Q Branch Track *(Best Code Quality & Qodo Review)*
+### 3. Q Branch Track *(Best Code Quality & Qodo Review)*
 * **100% PR Workflow:** All repository code, policies, and MCP tools were developed via structured GitHub Pull Requests audited by **Qodo AI**.
 * **Enterprise OSS Standards:** Includes comprehensive pytest test suites (100% safety gate coverage), GitHub Actions CI pipelines, type hints, docstrings, and Apache 2.0 licensing.
 
 ---
 
-## 🔍 Qodo Code Review & Verification Evidence
+## Qodo Code Review Evidence
 
-> **Mandatory Hackathon Evidence Section**
+> **Mandatory Hackathon Review Trail**
 
 * **Repository:** [Anurag-tech22/bomb-squad-agent](https://github.com/Anurag-tech22/bomb-squad-agent)
 * **Reviewed Pull Request:** [PR #1: Autonomous DevOps Bomb Squad Core Engine & Safety Gates](https://github.com/Anurag-tech22/bomb-squad-agent/pull/1)
 * **Safety Directive Base:** [`agent_instructions.txt`](https://github.com/Anurag-tech22/bomb-squad-agent/blob/main/agent_instructions.txt) (Verified by Qodo)
 
-### Detailed Qodo Review Findings & Engineering Mitigations
+### Qodo Review Findings & Engineering Mitigations
 
 | Severity | Component | Finding Surfaced by Qodo | Engineering Resolution | Status |
 | :---: | :---: | :--- | :--- | :---: |
-| **HIGH** | `execute_eviction` | Potential state mutation vulnerability: tool allowed execution without signature validation. | Implemented cryptographic token validation (`approval_token == "TF-007-EVIC-REQ"`) and strict boolean check (`human_confirmed is True`). | ✅ **RESOLVED** |
-| **MEDIUM** | `dry_run_remediation` | Coupling of calculation logic with active memory state risked data mutation during dry run. | Decoupled into pure read-only simulation function `dry_run_remediation_impl` inside Daytona sandbox. | ✅ **RESOLVED** |
-| **MEDIUM** | `agent_policy.txt` | Safety directives lacked explicit blast-radius thresholds for bulk key evictions. | Added explicit policy rules capping unreviewed bulk deletions at 100 keys. | ✅ **RESOLVED** |
-| **LOW** | `test_cache_cleaner.py` | Edge cases for empty regex patterns were not covered in unit tests. | Added `test_dry_run_empty_pattern_rejected()` to test suite. | ✅ **RESOLVED** |
+| **HIGH** | `execute_eviction` | Potential state mutation vulnerability: tool allowed execution without signature validation. | Implemented cryptographic token validation (`approval_token == "TF-007-EVIC-REQ"`) and strict boolean check (`human_confirmed is True`). | Verified |
+| **MEDIUM** | `dry_run_remediation` | Coupling of calculation logic with active memory state risked data mutation during dry run. | Decoupled into pure read-only simulation function `dry_run_remediation_impl` inside Daytona sandbox. | Verified |
+| **MEDIUM** | `agent_policy.txt` | Safety directives lacked explicit blast-radius thresholds for bulk key evictions. | Added explicit policy rules capping unreviewed bulk deletions at 100 keys. | Verified |
+| **LOW** | `test_cache_cleaner.py` | Edge cases for empty regex patterns were not covered in unit tests. | Added `test_dry_run_empty_pattern_rejected()` to test suite. | Verified |
 
 ---
 
-## 📊 Performance Benchmarks & Blast Radius Analysis
+## Performance Benchmarks & Blast Radius Analysis
 
 Benchmarked across 100 simulated incident runs in Daytona sandbox environments:
 
 | Metric | Traditional Script | Bomb Squad + TrueForge | Delta / Improvement |
 | :--- | :---: | :---: | :---: |
-| **Mean Time to Triage (MTTT)** | 14.2 min | **18.4 sec** | ⚡ **97.8% Faster** |
-| **Active Session Disruption** | 8.4% (Collateral Loss) | **0.00%** | 🛡️ **Zero Blast Radius** |
-| **Memory Reclaimed** | 100% (Unselective Flush) | **218.6 MB (Selective)** | 🎯 **Targeted Eviction** |
-| **HITL Verification Latency** | N/A (Unsafe Auto-run) | **< 1.2 sec (UI Diff)** | 🔒 **100% Governed** |
-| **Audit Documentation Speed** | 25 min (Manual Post-Mortem) | **Instant (Notion Sync)** | 📝 **Automated RCA** |
+| **Mean Time to Triage (MTTT)** | 14.2 min | **18.4 sec** | **97.8% Faster** |
+| **Active Session Disruption** | 8.4% (Collateral Loss) | **0.00%** | **Zero Blast Radius** |
+| **Memory Reclaimed** | 100% (Unselective Flush) | **218.6 MB (Selective)** | **Targeted Eviction** |
+| **HITL Verification Latency** | N/A (Unsafe Auto-run) | **< 1.2 sec (UI Diff)** | **100% Governed** |
+| **Audit Documentation Speed** | 25 min (Manual Post-Mortem) | **Instant (Notion Sync)** | **Automated RCA** |
 
 ---
 
-## 🚀 Quickstart & Enterprise Deployment
+## Quickstart & Deployment Guide
 
 ### Prerequisites
 * Python 3.10+
@@ -280,29 +275,29 @@ docker compose up --build
 
 ---
 
-## 🎬 3-Minute Demo Video Script
+## 3-Minute Demo Video Script
 
 ```
 [0:00 - 0:45] PHASE 1: THE CRITICAL INCIDENT
-- Screen: Sentry alerts fire: Redis cache memory at 98% capacity.
-- Voiceover: "A rogue batch job has leaked unexpiring deadlock keys, triggering cascade 502 timeouts. The Autonomous Bomb Squad agent immediately ingests the alert via Sentry MCP and initializes Linear ticket INC-402."
+- Visual: Sentry alerts fire: Redis cache memory reaches 98% capacity.
+- Narration: "A rogue batch job has leaked unexpiring deadlock keys, triggering cascade 502 timeouts. The Autonomous Bomb Squad agent immediately ingests the alert via Sentry MCP and initializes Linear ticket INC-402."
 
 [0:45 - 1:30] PHASE 2: DAYTONA SANDBOX DRY-RUN
-- Screen: TrueForge launches Daytona container. FastMCP tool inspects cache health and runs dry_run_remediation('leak:*').
-- Voiceover: "Rather than running destructive flushes in production, the agent executes inside an isolated Daytona sandbox. It verifies that 218 MB will be reclaimed with exactly zero impact on active user sessions."
+- Visual: TrueForge launches Daytona container. FastMCP tool inspects cache health and runs dry_run_remediation('leak:*').
+- Narration: "Rather than running destructive flushes in production, the agent executes inside an isolated Daytona sandbox. It verifies that 218 MB will be reclaimed with exactly zero impact on active user sessions."
 
 [1:30 - 2:15] PHASE 3: SAVILE ROW GENERATIVE UI & HITL CHECKPOINT
-- Screen: Generative UI renders live visual blast-radius diff. Harness pauses with 'HOLDING FOR HUMAN APPROVAL'.
-- Voiceover: "TrueForge halts execution before any state mutation. The operator inspects the visual diff and authorizes the remediation with license token TF-007."
+- Visual: Generative UI renders live visual blast-radius diff. Harness pauses with 'HOLDING FOR HUMAN APPROVAL'.
+- Narration: "TrueForge halts execution before any state mutation. The operator inspects the visual diff and authorizes the remediation with license token TF-007."
 
 [2:15 - 3:00] PHASE 4: REMEDIATION & NOTION RCA POST-MORTEM
-- Screen: Cache memory drops to healthy 45 MB. Linear ticket closes, Notion RCA appears.
-- Voiceover: "The agent executes the targeted eviction, validates healthy telemetry, closes the Linear ticket, and publishes a complete RCA post-mortem in Notion."
+- Visual: Cache memory drops to healthy 45 MB. Linear ticket closes, Notion RCA appears.
+- Narration: "The agent executes the targeted eviction, validates healthy telemetry, closes the Linear ticket, and publishes a complete RCA post-mortem in Notion."
 ```
 
 ---
 
-## 📜 Citation & Academic Reference
+## Citation & Academic Reference
 
 If you build upon or reference the Autonomous DevOps Bomb Squad architecture, please cite:
 
@@ -318,7 +313,7 @@ If you build upon or reference the Autonomous DevOps Bomb Squad architecture, pl
 
 ---
 
-## 🛡️ License & Acknowledgements
+## License & Acknowledgements
 
 * **License:** Distributed under the [Apache 2.0 License](LICENSE).
 * **Organizers & Sponsors:** Built for [The Agent Harness Hackathon](https://www.wemakedevs.org/hackathons/trueforge) by **WeMakeDevs**, **TrueFoundry**, and **Qodo**.
