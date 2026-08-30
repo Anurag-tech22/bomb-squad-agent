@@ -48,6 +48,22 @@ Our MCP server exposes three type-safe tools:
 
 ---
 
+## 🖥️ Live TrueForge Execution & Generative UI Walkthrough
+
+Inside the TrueForge web console (`http://localhost:8790`), the agent completes the following workflow:
+
+1. **Tool Scaffolding & Sandbox Testing**:
+   - Uses the MCP builder to generate FastMCP cleanup tools.
+   - Compiles and tests the tool in the isolated Daytona cloud sandbox.
+   - Automatically fixes runtime imports and executes dry-run validation.
+
+2. **Generative UI Blast Radius Dashboard**:
+   - Analyzes 5 system categories (`/tmp/*.log`, `/tmp/*.tmp`, `/var/tmp/*.tmp`, `~/.cache/thumbnails/*`, `/var/cache/apt/archives/*.deb`).
+   - Identifies 95.50 KB in candidate log files.
+   - Enforces a **Remediation Safety Hold**: The agent holds execution until the human operator provides explicit approval, preventing accidental collateral data loss.
+
+---
+
 ## 🛡️ Enterprise Code Quality & Qodo Verification
 
 Every line of code in Bomb Squad is verified against strict standards:

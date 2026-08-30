@@ -198,6 +198,26 @@ $$\mathcal{G}(\mathcal{T}) = \text{Verified}(\tau) \land \left( \mathcal{I}(\tex
 * **Blast Radius Diff Visualizer:** Displays color-coded terminal-style diffs showing reclaimed memory vs preserved active user sessions.
 * **Interactive Approval Modal:** Real-time state updates upon operator sign-off with dynamic telemetry gauges.
 
+---
+
+## 📸 Live TrueForge Harness Execution & Generative UI
+
+The Autonomous DevOps Bomb Squad operates natively inside the **TrueForge Agent Harness (`http://localhost:8790`)**, coordinating tool calls, sandboxed evaluation, and generative UI dashboards:
+
+### 1. TrueForge Agent Loop & Tool Execution
+The agent receives telemetry alerts, scaffolds FastMCP tools, and runs dry-test validations inside the Daytona cloud sandbox:
+- **Scaffold Python MCP cleanup tool** using mcp-builder pattern
+- **Compile and test** the scaffolded cache cleaner tool in the Daytona sandbox
+- **Auto-remediate imports & execute** test run of cache cleaner tool in sandbox
+- **Render Security Best Practices Summary** & enforce safety invariants
+
+### 2. Generative UI — System Cache Remediation Overview
+TrueForge renders a live, structured Generative UI dashboard providing SREs with clear visual insights before state mutation:
+- **Target Categories Evaluated**: 5 system categories (`/tmp/*.log`, `/tmp/*.tmp`, `/var/tmp/*.tmp`, `~/.cache/thumbnails/*`, `/var/cache/apt/archives/*.deb`)
+- **Target Volume Computed**: 95.50 KB across targeted log files
+- **Remediation Safety Hold**: Execution automatically halts in a non-destructive state, awaiting operator confirmation before any file deletion or eviction can occur.
+
+---
 ### 3. Q Branch Track *(Best Code Quality & Qodo Review)*
 * **100% PR Workflow:** All repository code, policies, and MCP tools were developed via structured GitHub Pull Requests audited by **Qodo AI**.
 * **Enterprise OSS Standards:** Includes comprehensive pytest test suites (100% safety gate coverage), GitHub Actions CI pipelines, type hints, docstrings, and Apache 2.0 licensing.
