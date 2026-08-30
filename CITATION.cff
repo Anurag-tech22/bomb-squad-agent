@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software in research or engineering, please cite it as below."
+authors:
+  - family-names: "Thopate"
+    given-names: "Anurag"
+    email: "anuragthopate2005@gmail.com"
+title: "Autonomous DevOps Bomb Squad: Zero-Trust Incident Remediation Runtime on TrueForge"
+version: 1.0.0
+date-released: 2026-08-30
+url: "https://github.com/Anurag-tech22/bomb-squad-agent"
+keywords:
+  - "ai-agents"
+  - "agent-harness"
+  - "trueforge"
+  - "mcp"
+  - "fastmcp"
+  - "devops"
+  - "hitl"
+  - "zero-trust"
+  - "daytona"
+  - "qodo"
+license: Apache-2.0

@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  cache-cleaner-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bomb-squad-mcp-server
+    environment:
+      - PYTHONUNBUFFERED=1
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - DAYTONA_API_KEY=${DAYTONA_API_KEY}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  sandbox-simulator:
+    image: python:3.11-slim
+    container_name: bomb-squad-sandbox
+    command: ["sleep", "infinity"]
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
