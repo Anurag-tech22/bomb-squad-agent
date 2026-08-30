@@ -9,12 +9,13 @@ Architected for TrueForge Agent Harness and verified under Qodo AI Code Review s
 
 from __future__ import annotations
 
+import copy
 import logging
 import re
 import threading
 from enum import Enum
 from typing import Any, Dict, Final, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # Configure structured enterprise logger
 logger = logging.getLogger("BombSquad.CacheRemediation")
@@ -54,12 +55,11 @@ class CacheHealthStatus(str, Enum):
 
 class CacheKeyMetadata(BaseModel):
     """Detailed metadata for an individual cache key."""
+    model_config = ConfigDict(populate_by_name=True)
+
     size_kb: int = Field(..., ge=0, description="Size of key in Kilobytes")
     key_type: KeyType = Field(..., alias="type", description="Classification of cache key")
     ttl_seconds: int = Field(..., alias="ttl", description="Time to live in seconds (-1 for unexpiring)")
-
-    class Config:
-        populate_by_name = True
 
 
 class CacheHealthReport(BaseModel):
@@ -141,9 +141,7 @@ class EmptyPatternError(BombSquadError):
 # In-Memory Cache Registry & State Management
 # ==============================================================================
 
-_registry_lock = threading.RLock()
-
-MOCK_CACHE_REGISTRY: Dict[str, Dict[str, Any]] = {
+INITIAL_CACHE_REGISTRY: Final[Dict[str, Dict[str, Any]]] = {
     "session:user_101": {"size_kb": 4, "type": "active_session", "ttl": 3600},
     "session:user_102": {"size_kb": 6, "type": "active_session", "ttl": 1800},
     "session:user_103": {"size_kb": 5, "type": "active_session", "ttl": 7200},
@@ -151,6 +149,16 @@ MOCK_CACHE_REGISTRY: Dict[str, Dict[str, Any]] = {
     "leak:deadlock_lock_4482": {"size_kb": 98200, "type": "poison_lock", "ttl": -1},
     "temp:batch_job_cache_09": {"size_kb": 45000, "type": "stale_batch", "ttl": -1},
 }
+
+_registry_lock = threading.RLock()
+MOCK_CACHE_REGISTRY: Dict[str, Dict[str, Any]] = copy.deepcopy(INITIAL_CACHE_REGISTRY)
+
+
+def reset_cache_registry() -> None:
+    """Resets the mock cache registry to its initial pristine state."""
+    with _registry_lock:
+        MOCK_CACHE_REGISTRY.clear()
+        MOCK_CACHE_REGISTRY.update(copy.deepcopy(INITIAL_CACHE_REGISTRY))
 
 
 # ==============================================================================
