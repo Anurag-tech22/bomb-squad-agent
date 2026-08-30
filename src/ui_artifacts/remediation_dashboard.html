@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autonomous DevOps Bomb Squad — Remediation Telemetry</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #090d16;
+      --bg-surface: #111827;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --border-color: #1f293d;
+      --accent-danger: #ef4444;
+      --accent-danger-glow: rgba(239, 68, 68, 0.2);
+      --accent-success: #10b981;
+      --accent-success-glow: rgba(16, 185, 129, 0.2);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.15);
+      --accent-amber: #f59e0b;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      padding: 24px;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+
+    .title-group h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-critical {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    .badge-sandbox {
+      background: var(--accent-cyan-glow);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    .stat-val {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .stat-val.danger { color: var(--accent-danger); }
+    .stat-val.cyan { color: var(--accent-cyan); }
+    .stat-val.success { color: var(--accent-success); }
+
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .diff-box {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .diff-line {
+      display: flex;
+      gap: 12px;
+      padding: 3px 0;
+    }
+
+    .diff-add { color: #3fb950; }
+    .diff-del { color: #f85149; }
+    .diff-neutral { color: #8b949e; }
+
+    .approval-gate {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(239, 68, 68, 0.05) 100%);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 10px;
+    }
+
+    .approval-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .approval-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .token-pill {
+      background: #1e293b;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+
+    .approval-desc {
+      font-size: 0.88rem;
+      color: #d1d5db;
+      margin-bottom: 18px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-approve {
+      background: #10b981;
+      color: #042f2e;
+    }
+    .btn-approve:hover {
+      background: #059669;
+      box-shadow: 0 0 15px var(--accent-success-glow);
+    }
+
+    .btn-abort {
+      background: #374151;
+      color: #f3f4f6;
+    }
+    .btn-abort:hover {
+      background: #4b5563;
+    }
+
+    .status-feedback {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title-group">
+        <h1><span>💣</span> DevOps Bomb Squad Incident Response</h1>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <span class="badge badge-critical">● Sentry Alert: High</span>
+        <span class="badge badge-sandbox">⚡ Daytona Sandbox</span>
+      </div>
+    </div>
+
+    <!-- Telemetry Stats -->
+    <div class="grid-stats">
+      <div class="stat-card">
+        <div class="stat-label">Cache Memory Load</div>
+        <div class="stat-val danger" id="mem-val">263.6 MB</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Deadlock Leak Keys</div>
+        <div class="stat-val danger" id="leak-val">2 Keys (218 MB)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active User Sessions</div>
+        <div class="stat-val success" id="session-val">3 Protected (0 Impact)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Dry Run Safety Verification</div>
+        <div class="stat-val cyan">100% PASSED</div>
+      </div>
+    </div>
+
+    <!-- Blast Radius & Dry-Run Diff -->
+    <div class="section-title">🔍 Sandbox Dry-Run Impact Telemetry</div>
+    <div class="diff-box">
+      <div class="diff-line diff-neutral"><span>[DAYTONA CONTAINER] Executing dry_run_remediation('leak:*')</span></div>
+      <div class="diff-line diff-del"><span>- EVICT [UNEXPIRING] leak:deadlock_lock_4481 (120.4 MB)</span></div>
+      <div class="diff-line diff-del"><span>- EVICT [UNEXPIRING] leak:deadlock_lock_4482 (98.2 MB)</span></div>
+      <div class="diff-line diff-add"><span>+ PRESERVE [TTL: 3600s] session:user_101 (4.0 KB)</span></div>
+      <div class="diff-line diff-add"><span>+ PRESERVE [TTL: 1800s] session:user_102 (6.0 KB)</span></div>
+      <div class="diff-line diff-add"><span>+ PRESERVE [TTL: 7200s] session:user_103 (5.0 KB)</span></div>
+      <div class="diff-line diff-neutral"><span>[SAFETY AUDIT] Net Memory Reclaimed: 218.6 MB | Active Sessions Evicted: 0</span></div>
+    </div>
+
+    <!-- Human-in-the-Loop Approval Gate -->
+    <div class="approval-gate" id="gate-container">
+      <div class="approval-header">
+        <div class="approval-title">
+          <span>⚠️</span> Human-in-the-Loop (HITL) Checkpoint
+        </div>
+        <div class="token-pill">TOKEN: TF-007-EVIC-REQ</div>
+      </div>
+      <p class="approval-desc">
+        Targeted cache key eviction is an irreversible infrastructure mutation. The TrueForge harness has suspended execution and awaits operator authorization before executing <code>execute_eviction()</code>.
+      </p>
+      <div class="action-buttons" id="btn-group">
+        <button class="btn btn-approve" onclick="handleApprove()">
+          ✓ Approve Remediation (License TF-007)
+        </button>
+        <button class="btn btn-abort" onclick="handleAbort()">
+          ✕ Abort Action
+        </button>
+      </div>
+      <div class="status-feedback" id="feedback"></div>
+    </div>
+  </div>
+
+  <script>
+    function handleApprove() {
+      const feedback = document.getElementById('feedback');
+      const btnGroup = document.getElementById('btn-group');
+      const memVal = document.getElementById('mem-val');
+      const leakVal = document.getElementById('leak-val');
+
+      btnGroup.style.display = 'none';
+      feedback.style.display = 'block';
+      feedback.style.background = 'rgba(16, 185, 129, 0.15)';
+      feedback.style.color = '#34d399';
+      feedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+      feedback.innerHTML = '⚡ [APPROVED BY OPERATOR]: Token TF-007-EVIC-REQ confirmed.<br>✓ Evicted 2 deadlock keys (218.6 MB reclaimed).<br>✓ Sentry alert resolved.<br>✓ Linear ticket closed & Notion RCA post-mortem synchronized.';
+      
+      memVal.className = 'stat-val success';
+      memVal.innerText = '45.0 MB';
+      leakVal.className = 'stat-val success';
+      leakVal.innerText = '0 Keys (0 MB)';
+    }
+
+    function handleAbort() {
+      const feedback = document.getElementById('feedback');
+      const btnGroup = document.getElementById('btn-group');
+
+      btnGroup.style.display = 'none';
+      feedback.style.display = 'block';
+      feedback.style.background = 'rgba(239, 68, 68, 0.15)';
+      feedback.style.color = '#f87171';
+      feedback.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+      feedback.innerHTML = '⛔ [OPERATOR ABORT]: Eviction cancelled. No changes were applied to production cache.';
+    }
+  </script>
+</body>
+</html>
