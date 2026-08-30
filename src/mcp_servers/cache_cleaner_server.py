@@ -14,20 +14,53 @@ import logging
 import re
 import threading
 from enum import Enum
-from typing import Any, Dict, Final, List, Optional
+from typing import Any, Final, TypedDict
+
 from pydantic import BaseModel, ConfigDict, Field
 
-# Configure structured enterprise logger
+# ---------------------------------------------------------------------------
+# Public API surface
+# ---------------------------------------------------------------------------
+
+__all__: list[str] = [
+    "REQUIRED_APPROVAL_TOKEN",
+    "MAX_BULK_EVICTION_THRESHOLD",
+    "INITIAL_CACHE_REGISTRY",
+    "MOCK_CACHE_REGISTRY",
+    "KeyType",
+    "CacheHealthStatus",
+    "CacheKeyMetadata",
+    "CacheHealthReport",
+    "DryRunResult",
+    "EvictionResult",
+    "BombSquadError",
+    "HITLConfirmationRequiredError",
+    "InvalidApprovalTokenError",
+    "EmptyPatternError",
+    "inspect_cache_health_impl",
+    "dry_run_remediation_impl",
+    "execute_eviction_impl",
+    "reset_cache_registry",
+]
+
+# ---------------------------------------------------------------------------
+# Structured enterprise logger
+# ---------------------------------------------------------------------------
+
 logger = logging.getLogger("BombSquad.CacheRemediation")
 logger.setLevel(logging.INFO)
 
-# Verification constants
+# ---------------------------------------------------------------------------
+# Module-level constants
+# ---------------------------------------------------------------------------
+
 REQUIRED_APPROVAL_TOKEN: Final[str] = "TF-007-EVIC-REQ"
 MAX_BULK_EVICTION_THRESHOLD: Final[int] = 100
 
 try:
     from mcp.server.fastmcp import FastMCP
-    mcp: Optional[FastMCP] = FastMCP("BombSquad-CacheCleaner")
+
+    mcp: FastMCP | None = FastMCP("BombSquad-CacheCleaner")
     HAS_FASTMCP: bool = True
 except ImportError:
     mcp = None
@@ -38,8 +71,10 @@ except ImportError:
 # Domain Models & Type Definitions (Pydantic Strict Schemas)
 # ==============================================================================
 
+
 class KeyType(str, Enum):
     """Enumeration of cache key classifications."""
+
     ACTIVE_SESSION = "active_session"
     POISON_LOCK = "poison_lock"
     STALE_BATCH = "stale_batch"
@@ -48,6 +83,7 @@ class KeyType(str, Enum):
 
 class CacheHealthStatus(str, Enum):
     """Cluster health status indicator."""
+
     HEALTHY = "HEALTHY"
     DEGRADED = "DEGRADED"
     CRITICAL = "CRITICAL"
@@ -55,6 +91,7 @@ class CacheHealthStatus(str, Enum):
 
 class CacheKeyMetadata(BaseModel):
     """Detailed metadata for an individual cache key."""
+
     model_config = ConfigDict(populate_by_name=True)
 
     size_kb: int = Field(..., ge=0, description="Size of key in Kilobytes")
@@ -64,46 +101,51 @@ class CacheKeyMetadata(BaseModel):
 
 class CacheHealthReport(BaseModel):
     """Comprehensive cache telemetry health report."""
+
     status: CacheHealthStatus
     total_keys: int = Field(..., ge=0)
     total_memory_used_mb: float = Field(..., ge=0.0)
     fragmentation_ratio: float = Field(..., ge=1.0)
     poisoned_keys_detected: int = Field(..., ge=0)
-    suspect_keys: List[str]
+    suspect_keys: list[str]
     recommended_action: str
 
 
 class DryRunResult(BaseModel):
     """Blast radius and safety analysis computed within the Daytona Sandbox."""
+
     pattern: str
     matched_keys_count: int = Field(..., ge=0)
-    keys_to_evict: List[str]
+    keys_to_evict: list[str]
     memory_reclaimed_mb: float = Field(..., ge=0.0)
     active_sessions_impacted: int = Field(..., ge=0)
     safety_check_passed: bool
     requires_hitl_approval: bool = True
     approval_token: str
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class EvictionResult(BaseModel):
     """Execution telemetry resulting from an authorized eviction."""
+
     success: bool
-    evicted_keys: List[str] = Field(default_factory=list)
+    evicted_keys: list[str] = Field(default_factory=list)
     remediation_status: str
     current_memory_mb: float = Field(..., ge=0.0)
     notion_sync: str = "READY"
     linear_ticket_status: str = "CLOSED"
-    error: Optional[str] = None
-    code: Optional[str] = None
+    error: str | None = None
+    code: str | None = None
 
 
 # ==============================================================================
 # Domain Exceptions
 # ==============================================================================
 
+
 class BombSquadError(Exception):
     """Base exception for all Bomb Squad remediation failures."""
+
     def __init__(self, message: str, code: str) -> None:
         super().__init__(message)
         self.message = message
@@ -112,28 +154,31 @@ class BombSquadError(Exception):
 
 class HITLConfirmationRequiredError(BombSquadError):
     """Raised when state mutation is attempted without operator sign-off."""
+
     def __init__(self) -> None:
         super().__init__(
             "EXECUTION_ABORTED: Human-in-the-Loop (HITL) operator confirmation is required.",
-            "ERR_HITL_REQUIRED"
+            "ERR_HITL_REQUIRED",
         )
 
 
 class InvalidApprovalTokenError(BombSquadError):
     """Raised when an invalid or expired cryptographic authorization token is supplied."""
+
     def __init__(self) -> None:
         super().__init__(
             "EXECUTION_ABORTED: Invalid approval token. Authorization denied.",
-            "ERR_INVALID_TOKEN"
+            "ERR_INVALID_TOKEN",
         )
 
 
 class EmptyPatternError(BombSquadError):
     """Raised when an empty target pattern is supplied."""
+
     def __init__(self) -> None:
         super().__init__(
             "INVALID_PATTERN: Target pattern cannot be empty.",
-            "ERR_EMPTY_PATTERN"
+            "ERR_EMPTY_PATTERN",
         )
 
 
@@ -141,7 +186,17 @@ class EmptyPatternError(BombSquadError):
 # In-Memory Cache Registry & State Management
 # ==============================================================================
 
-INITIAL_CACHE_REGISTRY: Final[Dict[str, Dict[str, Any]]] = {
+
+class _RegistryEntry(TypedDict):
+    """Typed structure for individual entries in the mock cache registry."""
+
+    size_kb: int
+    type: str
+    ttl: int
+
+
+#: Pristine initial state used to restore the registry between test runs.
+INITIAL_CACHE_REGISTRY: Final[dict[str, _RegistryEntry]] = {
     "session:user_101": {"size_kb": 4, "type": "active_session", "ttl": 3600},
     "session:user_102": {"size_kb": 6, "type": "active_session", "ttl": 1800},
     "session:user_103": {"size_kb": 5, "type": "active_session", "ttl": 7200},
@@ -151,11 +206,11 @@ INITIAL_CACHE_REGISTRY: Final[Dict[str, Dict[str, Any]]] = {
 }
 
 _registry_lock = threading.RLock()
-MOCK_CACHE_REGISTRY: Dict[str, Dict[str, Any]] = copy.deepcopy(INITIAL_CACHE_REGISTRY)
+MOCK_CACHE_REGISTRY: dict[str, _RegistryEntry] = copy.deepcopy(INITIAL_CACHE_REGISTRY)
 
 
 def reset_cache_registry() -> None:
-    """Resets the mock cache registry to its initial pristine state."""
+    """Reset the mock cache registry to its initial pristine state (test-only)."""
     with _registry_lock:
         MOCK_CACHE_REGISTRY.clear()
         MOCK_CACHE_REGISTRY.update(copy.deepcopy(INITIAL_CACHE_REGISTRY))
@@ -165,23 +220,30 @@ def reset_cache_registry() -> None:
 # Core Implementation Functions
 # ==============================================================================
 
-def inspect_cache_health_impl() -> Dict[str, Any]:
+#: Cache key types that indicate leaked or deadlocked entries.
+_POISONED_TYPES: frozenset[str] = frozenset(
+    {KeyType.POISON_LOCK.value, KeyType.STALE_BATCH.value}
+)
+
+
+def inspect_cache_health_impl() -> dict[str, Any]:
     """
-    Core implementation: Telemetry query calculating cluster memory and detecting deadlock keys.
-    Guaranteed read-only and free of side effects.
+    Telemetry query: calculate cluster memory usage and detect deadlock keys.
+
+    This function is guaranteed to be **read-only** and side-effect-free.
     """
     with _registry_lock:
         total_memory_kb = sum(item["size_kb"] for item in MOCK_CACHE_REGISTRY.values())
         poisoned_keys = [
-            k for k, v in MOCK_CACHE_REGISTRY.items()
-            if v["type"] in [KeyType.POISON_LOCK.value, KeyType.STALE_BATCH.value]
+            k for k, v in MOCK_CACHE_REGISTRY.items() if v["type"] in _POISONED_TYPES
         ]
-        
-        status = (
-            CacheHealthStatus.CRITICAL
-            if poisoned_keys
-            else CacheHealthStatus.HEALTHY
-        )
+
+        status = CacheHealthStatus.CRITICAL if poisoned_keys else CacheHealthStatus.HEALTHY
+
+        if status == CacheHealthStatus.CRITICAL:
+            logger.warning(
+                "Cache health CRITICAL: %d poisoned key(s) detected.", len(poisoned_keys)
+            )
 
         report = CacheHealthReport(
             status=status,
@@ -194,15 +256,17 @@ def inspect_cache_health_impl() -> Dict[str, Any]:
                 "Targeted eviction of unexpiring deadlock and stale batch keys"
                 if poisoned_keys
                 else "System healthy. No remediation required."
-            )
+            ),
         )
         return report.model_dump()
 
 
-def dry_run_remediation_impl(target_pattern: str) -> Dict[str, Any]:
+def dry_run_remediation_impl(target_pattern: str) -> dict[str, Any]:
     """
-    Core implementation: Computes zero-impact dry run inside Daytona Sandbox.
-    Calculates blast radius and strictly ensures zero active user session disruption.
+    Zero-impact dry run inside the Daytona Sandbox.
+
+    Calculates the blast radius for a given pattern and guarantees that no
+    active user sessions will be disrupted by a subsequent eviction.
     """
     if not target_pattern or not target_pattern.strip():
         result = DryRunResult(
@@ -213,7 +277,7 @@ def dry_run_remediation_impl(target_pattern: str) -> Dict[str, Any]:
             active_sessions_impacted=0,
             safety_check_passed=False,
             approval_token=REQUIRED_APPROVAL_TOKEN,
-            error="INVALID_PATTERN: Target pattern cannot be empty."
+            error="INVALID_PATTERN: Target pattern cannot be empty.",
         )
         return result.model_dump()
 
@@ -223,81 +287,107 @@ def dry_run_remediation_impl(target_pattern: str) -> Dict[str, Any]:
     with _registry_lock:
         matched_keys = [k for k in MOCK_CACHE_REGISTRY if regex.match(k)]
         active_sessions_affected = [
-            k for k in matched_keys
+            k
+            for k in matched_keys
             if MOCK_CACHE_REGISTRY[k]["type"] == KeyType.ACTIVE_SESSION.value
         ]
+        safe_keys = [k for k in matched_keys if k not in active_sessions_affected]
         reclaimable_kb = sum(
-            MOCK_CACHE_REGISTRY[k]["size_kb"]
-            for k in matched_keys
-            if MOCK_CACHE_REGISTRY[k]["type"] != KeyType.ACTIVE_SESSION.value
+            MOCK_CACHE_REGISTRY[k]["size_kb"] for k in safe_keys
         )
-        
-        safety_passed = len(active_sessions_affected) == 0
+        safety_passed = not active_sessions_affected
+
+        logger.info(
+            "Dry run complete: pattern=%r matched=%d safe=%d sessions_at_risk=%d",
+            target_pattern,
+            len(matched_keys),
+            len(safe_keys),
+            len(active_sessions_affected),
+        )
 
         result = DryRunResult(
             pattern=target_pattern,
             matched_keys_count=len(matched_keys),
-            keys_to_evict=[k for k in matched_keys if k not in active_sessions_affected],
+            keys_to_evict=safe_keys,
             memory_reclaimed_mb=round(reclaimable_kb / 1024.0, 2),
             active_sessions_impacted=len(active_sessions_affected),
             safety_check_passed=safety_passed,
             requires_hitl_approval=True,
-            approval_token=REQUIRED_APPROVAL_TOKEN
+            approval_token=REQUIRED_APPROVAL_TOKEN,
         )
         return result.model_dump()
 
 
+def _current_memory_mb() -> float:
+    """Return current registry memory usage in MB (caller must hold *_registry_lock*)."""
+    return round(sum(v["size_kb"] for v in MOCK_CACHE_REGISTRY.values()) / 1024.0, 2)
+
+
 def execute_eviction_impl(
     target_pattern: str, approval_token: str, human_confirmed: bool
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
-    Core implementation: Performs guarded key eviction upon operator authorization.
-    Enforces deterministic rejection if HITL confirmation or token validation fails.
+    Guarded key eviction upon operator authorization.
+
+    Enforces deterministic rejection when either the HITL confirmation flag is
+    ``False`` or the supplied approval token does not match the required value.
+    Active user sessions are unconditionally preserved regardless of pattern.
     """
     if not human_confirmed:
         err = HITLConfirmationRequiredError()
+        logger.warning("Eviction ABORTED: HITL confirmation not provided.")
+        with _registry_lock:
+            mem_mb = _current_memory_mb()
         return EvictionResult(
             success=False,
             remediation_status="ABORTED",
-            current_memory_mb=round(
-                sum(v["size_kb"] for v in MOCK_CACHE_REGISTRY.values()) / 1024.0, 2
-            ),
+            current_memory_mb=mem_mb,
             error=err.message,
-            code=err.code
+            code=err.code,
         ).model_dump()
 
     if approval_token != REQUIRED_APPROVAL_TOKEN:
         err = InvalidApprovalTokenError()
+        logger.warning("Eviction UNAUTHORIZED: invalid approval token supplied.")
+        with _registry_lock:
+            mem_mb = _current_memory_mb()
         return EvictionResult(
             success=False,
             remediation_status="UNAUTHORIZED",
-            current_memory_mb=round(
-                sum(v["size_kb"] for v in MOCK_CACHE_REGISTRY.values()) / 1024.0, 2
-            ),
+            current_memory_mb=mem_mb,
             error=err.message,
-            code=err.code
+            code=err.code,
         ).model_dump()
 
     escaped = re.escape(target_pattern).replace(r"\*", ".*")
     regex = re.compile(f"^{escaped}$")
-    evicted: List[str] = []
+    evicted: list[str] = []
 
     with _registry_lock:
         for k in list(MOCK_CACHE_REGISTRY.keys()):
-            if regex.match(k) and MOCK_CACHE_REGISTRY[k]["type"] != KeyType.ACTIVE_SESSION.value:
+            if (
+                regex.match(k)
+                and MOCK_CACHE_REGISTRY[k]["type"] != KeyType.ACTIVE_SESSION.value
+            ):
                 evicted.append(k)
                 del MOCK_CACHE_REGISTRY[k]
 
-        current_kb = sum(v["size_kb"] for v in MOCK_CACHE_REGISTRY.values())
+        mem_mb = _current_memory_mb()
 
-        return EvictionResult(
-            success=True,
-            evicted_keys=evicted,
-            remediation_status="RESOLVED",
-            current_memory_mb=round(current_kb / 1024.0, 2),
-            notion_sync="READY",
-            linear_ticket_status="CLOSED"
-        ).model_dump()
+    logger.info(
+        "Eviction RESOLVED: %d key(s) removed — %.2f MB remaining.",
+        len(evicted),
+        mem_mb,
+    )
+
+    return EvictionResult(
+        success=True,
+        evicted_keys=evicted,
+        remediation_status="RESOLVED",
+        current_memory_mb=mem_mb,
+        notion_sync="READY",
+        linear_ticket_status="CLOSED",
+    ).model_dump()
 
 
 # ==============================================================================
@@ -305,21 +395,22 @@ def execute_eviction_impl(
 # ==============================================================================
 
 if HAS_FASTMCP and mcp is not None:
+
     @mcp.tool()
-    def inspect_cache_health() -> Dict[str, Any]:
-        """Inspects cache cluster memory, fragmentation ratio, and flags leaked or poisoned keys."""
+    def inspect_cache_health() -> dict[str, Any]:
+        """Inspect cache cluster memory, fragmentation ratio, and flag leaked or poisoned keys."""
         return inspect_cache_health_impl()
 
     @mcp.tool()
-    def dry_run_remediation(target_pattern: str) -> Dict[str, Any]:
-        """Executes a zero-impact dry run inside the sandbox to calculate reclaimed memory."""
+    def dry_run_remediation(target_pattern: str) -> dict[str, Any]:
+        """Execute a zero-impact dry run inside the sandbox to calculate reclaimed memory."""
         return dry_run_remediation_impl(target_pattern)
 
     @mcp.tool()
     def execute_eviction(
         target_pattern: str, approval_token: str, human_confirmed: bool
-    ) -> Dict[str, Any]:
-        """Executes actual eviction. Fails immediately if human approval is not confirmed."""
+    ) -> dict[str, Any]:
+        """Execute eviction. Fails deterministically if human approval is not confirmed."""
         return execute_eviction_impl(target_pattern, approval_token, human_confirmed)
 
 
