@@ -1,14 +1,34 @@
-# Autonomous DevOps Bomb Squad Agent 💣🛡️
-### *Mission TF-007: Zero-Trust Autonomous Incident Remediation Runtime*
+<div align="center">
 
-[![Harness: TrueForge](https://img.shields.io/badge/Agent_Harness-TrueForge_v1.0-3B82F6?style=for-the-badge&logo=rocket&logoColor=white)](https://trueforge.dev)
-[![Code Review: Qodo AI](https://img.shields.io/badge/Code_Review-Qodo_AI_Verified-10B981?style=for-the-badge&logo=github&logoColor=white)](https://qodo.ai)
-[![Models: Gemini 3.1 Pro](https://img.shields.io/badge/Reasoning-Gemini_3.1_Pro_%7C_Flash-8B5CF6?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
-[![Sandbox: Daytona](https://img.shields.io/badge/Sandbox-Daytona_Isolated_Container-06B6D4?style=for-the-badge&logo=docker&logoColor=white)](https://daytona.io)
-[![Safety Invariant: HITL Gate](https://img.shields.io/badge/Safety-Human--in--the--Loop_100%25-EC4899?style=for-the-badge&logo=auth0&logoColor=white)](#-formal-safety-invariants--hitl-gate)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-F59E0B?style=for-the-badge)](LICENSE)
+# Autonomous DevOps Bomb Squad 💣🛡️
+### *Mission TF-007: Enterprise Zero-Trust Autonomous Remediation Runtime*
+
+```
+[ CLASSIFICATION: SRE TIER-1 RUNTIME ] • [ ENGINE: TRUEFORGE v1.0 ] • [ AUDIT: QODO AI VERIFIED ]
+```
+
+[![Harness: TrueForge](https://img.shields.io/badge/Agent_Harness-TrueForge_v1.0-2563EB?style=for-the-badge&logo=rocket&logoColor=white)](https://trueforge.dev)
+[![Code Review: Qodo AI](https://img.shields.io/badge/Code_Review-Qodo_AI_Verified-059669?style=for-the-badge&logo=github&logoColor=white)](https://qodo.ai)
+[![Models: Gemini 3.1 Pro](https://img.shields.io/badge/Reasoning-Gemini_3.1_Pro_%7C_Flash-7C3AED?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
+[![Sandbox: Daytona](https://img.shields.io/badge/Sandbox-Daytona_Isolated-0891B2?style=for-the-badge&logo=docker&logoColor=white)](https://daytona.io)
+[![Safety: HITL Gate](https://img.shields.io/badge/Safety_Gate-HITL_100%25_Governed-DB2777?style=for-the-badge&logo=auth0&logoColor=white)](#-formal-safety-invariants--hitl-gate)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-D97706?style=for-the-badge)](LICENSE)
 
 ---
+
+| Enterprise Architecture Matrix | System Specification | Governance & Verification Standard |
+| :--- | :--- | :--- |
+| **Agent Harness Runtime** | **TrueForge v1.0** (`@truefoundry/trueforge`) | Deterministic loop control, tool orchestration & HITL interception |
+| **Autonomous Code Review** | **Qodo AI Verified** | Continuous semantic PR audits, safety invariant & AST checks |
+| **Cognitive Reasoning Engine** | **Google Gemini 3.1 Pro & 3.6 Flash** | Causal multi-step root cause analysis & sub-second schema parsing |
+| **Isolated Cloud Sandbox** | **Daytona Ephemeral Containers** | Zero-network-egress containerized dry-runs and blast-radius audit |
+| **Safety Governance Gate** | **100% Deterministic HITL Gate** | Cryptographic authorization token (`TF-007-EVIC-REQ`) |
+| **Open Source Licensing** | **Apache License 2.0** | Enterprise-grade permissibility for production environments |
+
+</div>
+
+---
+
 
 ## 📑 Table of Contents
 - [Executive Overview](#-executive-overview)
