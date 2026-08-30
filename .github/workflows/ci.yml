@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  quality-gate:
+  matrix-tests:
     name: Run Unit Tests & Qodo Quality Checks
     runs-on: ubuntu-latest
     strategy:
@@ -35,11 +35,11 @@ jobs:
 
       - name: Lint with Ruff
         run: |
-          ruff check src/ tests/
+          ruff check src/ tests/ main.py cache_cleaner_server.py
 
       - name: Validate Bytecode Compilation
         run: |
-          python -m py_compile src/mcp_servers/cache_cleaner_server.py
+          python -m py_compile src/mcp_servers/cache_cleaner_server.py cache_cleaner_server.py main.py
 
       - name: Run Pytest Suite with Coverage
         run: |
@@ -48,3 +48,12 @@ jobs:
       - name: Enforce Minimum Coverage Threshold
         run: |
           python -m pytest tests/ --cov=src --cov-fail-under=80 -q
+
+  quality-gate:
+    name: quality-gate
+    needs: matrix-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm All Checks Passed
+        run: |
+          echo "All unit tests, coverage, and Qodo quality checks passed across all Python matrix environments."
