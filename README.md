@@ -34,7 +34,6 @@
 - [Qodo Code Review Evidence](#qodo-code-review-evidence)
 - [Performance Benchmarks & Blast Radius Analysis](#performance-benchmarks--blast-radius-analysis)
 - [Quickstart & Deployment Guide](#quickstart--deployment-guide)
-- [3-Minute Demo Video Script](#3-minute-demo-video-script)
 - [Citation & Academic Reference](#citation--academic-reference)
 
 ---
@@ -291,28 +290,6 @@ npx @truefoundry/trueforge --config trueforge.config.json
 ### 5. Run via Docker Compose (Optional)
 ```bash
 docker compose up --build
-```
-
----
-
-## 3-Minute Demo Video Script
-
-```
-[0:00 - 0:45] PHASE 1: THE CRITICAL INCIDENT
-- Visual: Sentry alerts fire: Redis cache memory reaches 98% capacity.
-- Narration: "A rogue batch job has leaked unexpiring deadlock keys, triggering cascade 502 timeouts. The Autonomous Bomb Squad agent immediately ingests the alert via Sentry MCP and initializes Linear ticket INC-402."
-
-[0:45 - 1:30] PHASE 2: DAYTONA SANDBOX DRY-RUN
-- Visual: TrueForge launches Daytona container. FastMCP tool inspects cache health and runs dry_run_remediation('leak:*').
-- Narration: "Rather than running destructive flushes in production, the agent executes inside an isolated Daytona sandbox. It verifies that 218 MB will be reclaimed with exactly zero impact on active user sessions."
-
-[1:30 - 2:15] PHASE 3: SAVILE ROW GENERATIVE UI & HITL CHECKPOINT
-- Visual: Generative UI renders live visual blast-radius diff. Harness pauses with 'HOLDING FOR HUMAN APPROVAL'.
-- Narration: "TrueForge halts execution before any state mutation. The operator inspects the visual diff and authorizes the remediation with license token TF-007."
-
-[2:15 - 3:00] PHASE 4: REMEDIATION & NOTION RCA POST-MORTEM
-- Visual: Cache memory drops to healthy 45 MB. Linear ticket closes, Notion RCA appears.
-- Narration: "The agent executes the targeted eviction, validates healthy telemetry, closes the Linear ticket, and publishes a complete RCA post-mortem in Notion."
 ```
 
 ---
